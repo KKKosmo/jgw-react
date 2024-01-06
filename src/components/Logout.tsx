@@ -1,14 +1,8 @@
 import React from 'react';
-import api from './api.tsx';
 
 const Logout = ({ onLogout }) => {
-  const handleLogout = async () => {
-    try {
-      await api.post('/logout');
-      onLogout();
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+  const handleLogout = () => {
+    onLogout();
   };
 
   return (
@@ -20,4 +14,3 @@ const Logout = ({ onLogout }) => {
 };
 
 export default Logout;
- 
