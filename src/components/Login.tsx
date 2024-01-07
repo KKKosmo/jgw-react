@@ -1,35 +1,47 @@
-import React, { useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
+import { Navigate } from "react-router-dom";
 
-const Login = ({ onLogin }) => {
-  const [credentials, setCredentials] = useState({ name: '', password: '' });
+const Login = (props: { setUser: (user: string) => void }) => {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [redirect, setRedirect] = useState(false);
 
-  const handleLogin = () => {
-    onLogin(credentials);
-  };
+  const submit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+
+    const response = await fetch('http://localhost:8000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        name,
+        password
+      })
+    });
+
+    const content = await response.json();
+
+    setRedirect(true);
+    props.setUser(content.user);
+  }
+
+  if (redirect) {
+    return <Navigate to="/" />;
+  }
 
   return (
-    <div>
-      <h2>Login</h2>
-      <label>
-        Name:
-        <input
-          type="text"
-          name="name"
-          value={credentials.name}
-          onChange={(e) => setCredentials({ ...credentials, name: e.target.value })}
-        />
-      </label>
-      <label>
-        Password:
-        <input
-          type="password"
-          name="password"
-          value={credentials.password}
-          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-        />
-      </label>
-      <button onClick={handleLogin}>Login</button>
-    </div>
+    <form onSubmit={submit}>
+      <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+      <input type="text" className="form-control" placeholder="Username" required
+        onChange={e => setName(e.target.value)}
+      />
+
+      <input type="password" className="form-control" placeholder="Password" required
+        onChange={e => setPassword(e.target.value)}
+      />
+
+      <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+    </form>
   );
 };
 

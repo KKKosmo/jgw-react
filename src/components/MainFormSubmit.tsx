@@ -1,5 +1,6 @@
 // src/components/MainFormSubmit.js
 import React, { useState } from 'react';
+import { ChangeEvent, FormEvent } from 'react';
 
 const MainFormSubmit = () => {
   // State to store form data
@@ -18,20 +19,20 @@ const MainFormSubmit = () => {
     room: '',
   });
 
-  // Handle form input changes
-  const handleInputChange = (e) => {
+  
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-
+  
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
-
+  
   // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     try {
       // Make a POST request to your Laravel API endpoint
       const response = await fetch('http://127.0.0.1:8000/api/main', {
@@ -41,10 +42,10 @@ const MainFormSubmit = () => {
         },
         body: JSON.stringify(formData),
       });
-      
+  
       const data = await response.json();
       console.log('Response:', data);
-
+  
       setFormData({
         user: '',
         name: '',
