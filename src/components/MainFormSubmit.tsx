@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { ChangeEvent, FormEvent } from 'react';
 
-const MainFormSubmit = () => {
-  // State to store form data
+
+const MainFormSubmit = (props: { user: string }) => {
+  const { user } = props;
+
   const [formData, setFormData] = useState({
     user: '',
     name: '',
@@ -40,6 +42,7 @@ const MainFormSubmit = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
   
@@ -47,7 +50,7 @@ const MainFormSubmit = () => {
       console.log('Response:', data);
   
       setFormData({
-        user: '',
+        user: user,
         name: '',
         pax: 0,
         vehicle: 0,
@@ -69,10 +72,6 @@ const MainFormSubmit = () => {
     <div>
       <h2>Main Form</h2>
       <form onSubmit={handleSubmit} className='form'>
-        <label className="label">
-          User:
-          <input className="input" type="text" name="user" value={formData.user} onChange={handleInputChange} />
-        </label>
         <label className="label">
           Name:
           <input className="input" type="text" name="name" value={formData.name} onChange={handleInputChange} />

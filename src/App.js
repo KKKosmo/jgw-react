@@ -1,43 +1,45 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import Login from "./components/Login";
-import Nav from "./components/Nav";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Home from "./components/Home";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "./dist/Login";
+import Nav from "./dist/Nav";
+import Home from "./dist/Home";
+import MainFormSubmit from "./dist/MainFormSubmit";
 
 function App() {
-    const [user, setUser] = useState('');
+  const [user, setUser] = useState('');
 
-    useEffect(() => {
-        (
-            async () => {
-                const response = await fetch('http://localhost:8000/api/user', {
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'include',
-                });
+  useEffect(() => {
+      (
+          async () => {
+              const response = await fetch('http://localhost:8000/api/user', {
+                  headers: {'Content-Type': 'application/json'},
+                  credentials: 'include',
+              });
 
-                const content = await response.json();
-                console.log(content.name);
-                setUser(content.name);
-            }
-        )();
-    });
+              const content = await response.json();
+              console.log(content.name);
+              setUser(content.name);
+          }
+      )();
+  }, []);
 
 
-    return (
-        <div className="App">
-            <BrowserRouter>
-                <Nav name={user} setUser={setUser}/>
+  return (
+      <div className="App">
+          <BrowserRouter>
+              <Nav name={user} setUser={setUser}/>
 
-                <main className="form-signin">
-                  <Routes>
-                    <Route path="/" element={ <Home user={user} /> }></Route>
-                    <Route path="/login" element={ <Login setUser={setUser} /> }></Route>
-                  </Routes>
-                </main>
-            </BrowserRouter>
-        </div>
-    );
+              <main className="form-signin">
+                <Routes>
+                  <Route path="/" element={ <Home user={user} /> }></Route>
+                  <Route path="/login" element={ <Login setUser={setUser} /> }></Route>
+                  <Route path="/mainFormSubmit" element={ <MainFormSubmit user={user} /> }></Route>
+                </Routes>
+              </main>
+          </BrowserRouter>
+      </div>
+  );
 }
 
 export default App;

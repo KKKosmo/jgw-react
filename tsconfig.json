@@ -4,7 +4,9 @@
       "lib": ["dom", "es2015"],
       "jsx": "react",
       "strict": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "outDir": "./src/dist",
+      
     },
     "include": ["src/**/*.tsx", "src/**/*.ts"],
     "exclude": ["node_modules"]

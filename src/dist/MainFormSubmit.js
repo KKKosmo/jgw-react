@@ -72,8 +72,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/components/MainFormSubmit.js
 var react_1 = __importStar(require("react"));
-var MainFormSubmit = function () {
-    // State to store form data
+var MainFormSubmit = function (props) {
+    var user = props.user;
     var _a = (0, react_1.useState)({
         user: '',
         name: '',
@@ -110,6 +110,7 @@ var MainFormSubmit = function () {
                             headers: {
                                 'Content-Type': 'application/json',
                             },
+                            credentials: 'include',
                             body: JSON.stringify(formData),
                         })];
                 case 2:
@@ -119,7 +120,7 @@ var MainFormSubmit = function () {
                     data = _a.sent();
                     console.log('Response:', data);
                     setFormData({
-                        user: '',
+                        user: user,
                         name: '',
                         pax: 0,
                         vehicle: 0,
@@ -144,9 +145,6 @@ var MainFormSubmit = function () {
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("h2", null, "Main Form"),
         react_1.default.createElement("form", { onSubmit: handleSubmit, className: 'form' },
-            react_1.default.createElement("label", { className: "label" },
-                "User:",
-                react_1.default.createElement("input", { className: "input", type: "text", name: "user", value: formData.user, onChange: handleInputChange })),
             react_1.default.createElement("label", { className: "label" },
                 "Name:",
                 react_1.default.createElement("input", { className: "input", type: "text", name: "name", value: formData.name, onChange: handleInputChange })),

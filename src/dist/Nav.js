@@ -66,7 +66,9 @@ var Nav = function (props) {
     else {
         menu = (react_1.default.createElement("ul", { className: "navbar-nav me-auto mb-2 mb-md-0" },
             react_1.default.createElement("li", { className: "nav-item active" },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: logout }, "Logout"))));
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: logout }, "Logout")),
+            react_1.default.createElement("li", { className: "nav-item active" },
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/MainFormSubmit", className: "nav-link" }, "New Book"))));
     }
     return (react_1.default.createElement("nav", { className: "navbar navbar-expand-md navbar-dark bg-dark mb-4" },
         react_1.default.createElement("div", { className: "container-fluid" },

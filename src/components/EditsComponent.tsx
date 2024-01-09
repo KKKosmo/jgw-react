@@ -16,8 +16,6 @@ const EditsComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchEdits = async () => {
-      // console.log("key = " + process.env.REACT_APP_PUSHER_APP_KEY);
-      // console.log("cluster = " + process.env.REACT_APP_PUSHER_APP_CLUSTER);
       try {
         const response = await fetch('http://127.0.0.1:8000/api/edits');
         const data = await response.json();

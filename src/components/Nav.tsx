@@ -13,7 +13,6 @@ const Nav = (props: { name: string, setUser: (name: string) => void }) => {
     }
 
     let menu;
-
     if (props.name === '') {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">
@@ -25,8 +24,11 @@ const Nav = (props: { name: string, setUser: (name: string) => void }) => {
     } else {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">
+            <li className="nav-item active">
+                <Link to="/login" className="nav-link" onClick={logout}>Logout</Link>
+            </li>
                 <li className="nav-item active">
-                    <Link to="/login" className="nav-link" onClick={logout}>Logout</Link>
+                    <Link to="/MainFormSubmit" className="nav-link">New Book</Link>
                 </li>
             </ul>
         )
