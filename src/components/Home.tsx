@@ -90,7 +90,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         <th onClick={() => handleSort('videoke')}>Videoke</th>
         <th onClick={() => handleSort('partial_payment')}>Partial Payment</th>
         <th onClick={() => handleSort('full_payment')}>Full Payment</th>
-        <th onClick={() => handleSort('paid')}>Paid</th>
+        <th onClick={() => handleSort('paid')}>Fully Paid</th>
         <th onClick={() => handleSort('checkIn')}>Check In</th>
         <th onClick={() => handleSort('checkOut')}>Check Out</th>
         <th onClick={() => handleSort('room')}>Room</th>

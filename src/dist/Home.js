@@ -135,7 +135,7 @@ var Home = function (_a) {
             react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); } }, "Videoke"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); } }, "Partial Payment"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); } }, "Full Payment"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); } }, "Paid"),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); } }, "Fully Paid"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); } }, "Check In"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); } }, "Check Out"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('room'); } }, "Room"),

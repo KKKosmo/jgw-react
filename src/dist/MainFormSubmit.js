@@ -72,10 +72,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/components/MainFormSubmit.js
 var react_1 = __importStar(require("react"));
+var react_router_dom_1 = require("react-router-dom");
 var MainFormSubmit = function (props) {
+    var navigate = (0, react_router_dom_1.useNavigate)(); // Initialize useNavigate
     var user = props.user;
+    // useEffect(() =>{
+    //   if (user === '') {
+    //     navigate('/login'); // Replace '/login' with the actual path to your login page
+    //     return;
+    //   }
+    // })
     var _a = (0, react_1.useState)({
-        user: '',
+        user: user,
         name: '',
         pax: 0,
         vehicle: 0,
@@ -90,12 +98,15 @@ var MainFormSubmit = function (props) {
     }), formData = _a[0], setFormData = _a[1];
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type, checked = _a.checked;
+        // if (type === 'number' && parseFloat(value) < 0) {
+        //   e.target.value = '0';
+        //   console.log(name);
+        // }
         setFormData(function (prevData) {
             var _a;
             return (__assign(__assign({}, prevData), (_a = {}, _a[name] = type === 'checkbox' ? checked : value, _a)));
         });
     };
-    // Handle form submission
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var response, data, error_1;
         return __generator(this, function (_a) {
@@ -105,7 +116,7 @@ var MainFormSubmit = function (props) {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, fetch('http://127.0.0.1:8000/api/main', {
+                    return [4 /*yield*/, fetch('http://localhost:8000/api/main', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -119,20 +130,23 @@ var MainFormSubmit = function (props) {
                 case 3:
                     data = _a.sent();
                     console.log('Response:', data);
-                    setFormData({
-                        user: user,
-                        name: '',
-                        pax: 0,
-                        vehicle: 0,
-                        pets: false,
-                        videoke: false,
-                        partial_payment: 0.0,
-                        full_payment: 0.0,
-                        paid: false,
-                        checkIn: '',
-                        checkOut: '',
-                        room: '',
-                    });
+                    // setFormData({
+                    //   user: user,
+                    //   name: '',
+                    //   pax: 0,
+                    //   vehicle: 0,
+                    //   pets: false,
+                    //   videoke: false,
+                    //   partial_payment: 0.0,
+                    //   full_payment: 0.0,
+                    //   paid: false,
+                    //   checkIn: '',
+                    //   checkOut: '',
+                    //   room: '',
+                    // });
+                    if (data.message === "Record created successfully") {
+                        navigate('/');
+                    }
                     return [3 /*break*/, 5];
                 case 4:
                     error_1 = _a.sent();
@@ -147,13 +161,13 @@ var MainFormSubmit = function (props) {
         react_1.default.createElement("form", { onSubmit: handleSubmit, className: 'form' },
             react_1.default.createElement("label", { className: "label" },
                 "Name:",
-                react_1.default.createElement("input", { className: "input", type: "text", name: "name", value: formData.name, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "text", name: "name", value: formData.name, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Pax:",
-                react_1.default.createElement("input", { className: "input", type: "number", name: "pax", value: formData.pax, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "number", name: "pax", value: formData.pax, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Vehicle:",
-                react_1.default.createElement("input", { className: "input", type: "number", name: "vehicle", value: formData.vehicle, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "number", name: "vehicle", value: formData.vehicle, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Pets:",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "pets", checked: formData.pets, onChange: handleInputChange })),
@@ -162,19 +176,19 @@ var MainFormSubmit = function (props) {
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "videoke", checked: formData.videoke, onChange: handleInputChange })),
             react_1.default.createElement("label", { className: "label" },
                 "Partial Payment:",
-                react_1.default.createElement("input", { className: "input", type: "number", step: "0.01", name: "partial_payment", value: formData.partial_payment, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "number", step: "0.01", name: "partial_payment", value: formData.partial_payment, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Full Payment:",
-                react_1.default.createElement("input", { className: "input", type: "number", step: "0.01", name: "full_payment", value: formData.full_payment, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "number", step: "0.01", name: "full_payment", value: formData.full_payment, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Check In:",
-                react_1.default.createElement("input", { className: "input", type: "date", name: "checkIn", value: formData.checkIn, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "date", name: "checkIn", value: formData.checkIn, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Check Out:",
-                react_1.default.createElement("input", { className: "input", type: "date", name: "checkOut", value: formData.checkOut, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "date", name: "checkOut", value: formData.checkOut, onChange: handleInputChange, required: true })),
             react_1.default.createElement("label", { className: "label" },
                 "Room:",
-                react_1.default.createElement("input", { className: "input", type: "text", name: "room", value: formData.room, onChange: handleInputChange })),
+                react_1.default.createElement("input", { className: "input", type: "text", name: "room", value: formData.room, onChange: handleInputChange, required: true })),
             react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit"))));
 };
 exports.default = MainFormSubmit;
