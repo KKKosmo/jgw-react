@@ -85,13 +85,14 @@ var react_router_dom_1 = require("react-router-dom");
 var MainFormSubmit = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
     var user = props.user;
+    var id = (0, react_router_dom_1.useParams)().id; // Get the ID from the route parameters
     var _a = (0, react_1.useState)({
-        user: user,
+        user: '',
         name: '',
         pax: 0,
         vehicle: 0,
-        pets: null,
-        videoke: null,
+        pets: false,
+        videoke: false,
         partial_payment: 0.0,
         full_payment: 0.0,
         paid: false,
@@ -100,6 +101,41 @@ var MainFormSubmit = function (props) {
         room: '',
     }), formData = _a[0], setFormData = _a[1];
     var _b = (0, react_1.useState)([]), selectedRooms = _b[0], setSelectedRooms = _b[1];
+    (0, react_1.useEffect)(function () {
+        var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response, result_1, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch("http://localhost:8000/api/main/".concat(id), {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                credentials: 'include',
+                            })];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.ok) {
+                            throw new Error("HTTP error! Status: ".concat(response.status));
+                        }
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        result_1 = _a.sent();
+                        setFormData(function (prevData) { return (__assign(__assign(__assign({}, prevData), result_1), { videoke: Boolean(result_1.videoke), pets: Boolean(result_1.pets) })); });
+                        setSelectedRooms(result_1.room.split(',').map(function (room) { return room.trim().toUpperCase(); }));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error('Error fetching data:', error_1.message);
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        }); };
+        fetchData();
+    }, [id]);
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -124,7 +160,7 @@ var MainFormSubmit = function (props) {
         }
     };
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var formattedRoom, response, data, error_1;
+        var formattedRoom, response, data, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -135,9 +171,8 @@ var MainFormSubmit = function (props) {
                 case 1:
                     _a.trys.push([1, 4, , 5]);
                     formData.room = formattedRoom;
-                    formData.user = user;
-                    return [4 /*yield*/, fetch('http://localhost:8000/api/main', {
-                            method: 'POST',
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main/".concat(id), {
+                            method: 'PUT', // Use PUT method for updating
                             headers: {
                                 'Content-Type': 'application/json',
                             },
@@ -150,20 +185,20 @@ var MainFormSubmit = function (props) {
                 case 3:
                     data = _a.sent();
                     console.log('Response:', data);
-                    if (data.message === 'Record created successfully') {
+                    if (data.message === 'Record updated successfully') {
                         navigate('/');
                     }
                     return [3 /*break*/, 5];
                 case 4:
-                    error_1 = _a.sent();
-                    console.error('Error creating record:', error_1);
+                    error_2 = _a.sent();
+                    console.error('Error updating record:', error_2);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
             }
         });
     }); };
     return (react_1.default.createElement("div", null,
-        react_1.default.createElement("h2", null, "Main Form"),
+        react_1.default.createElement("h2", null, "Edit Form"),
         react_1.default.createElement("form", { onSubmit: handleSubmit, className: "form" },
             react_1.default.createElement("label", { className: "label" },
                 "Name:",
@@ -212,6 +247,6 @@ var MainFormSubmit = function (props) {
                 "KUBO 2",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "exclusive", checked: selectedRooms.includes('EXCLUSIVE'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
-            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit"))));
+            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Update"))));
 };
 exports.default = MainFormSubmit;

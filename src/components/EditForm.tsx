@@ -1,19 +1,20 @@
 // src/components/MainFormSubmit.js
 import React, { useEffect, useState } from 'react';
 import { ChangeEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const MainFormSubmit = (props: { user: string }) => {
   const navigate = useNavigate();
   const { user } = props;
+  const { id } = useParams(); // Get the ID from the route parameters
 
   const [formData, setFormData] = useState({
-    user: user,
+    user: '',
     name: '',
     pax: 0,
     vehicle: 0,
-    pets: null,
-    videoke: null,
+    pets: false,
+    videoke: false,
     partial_payment: 0.0,
     full_payment: 0.0,
     paid: false,
@@ -21,8 +22,47 @@ const MainFormSubmit = (props: { user: string }) => {
     checkOut: '',
     room: '',
   });
+  
 
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
+
+  interface ApiResponse {
+    room: string;
+    pets: boolean;
+    videoke: boolean;
+    // ... other properties
+  }
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/main/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json() as ApiResponse;
+        setFormData((prevData) => ({
+          ...prevData,
+          ...result,
+          videoke: Boolean (result.videoke),
+          pets: Boolean (result.pets),
+        }));
+        setSelectedRooms(result.room.split(',').map((room) => room.trim().toUpperCase()));
+      } catch (error: any) {
+        console.error('Error fetching data:', error.message);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -54,12 +94,12 @@ const MainFormSubmit = (props: { user: string }) => {
 
     let formattedRoom = selectedRooms.join(', ');
     console.log(formattedRoom);
-    
+
     try {
       formData.room = formattedRoom;
-      formData.user = user;
-      const response = await fetch('http://localhost:8000/api/main', {
-        method: 'POST',
+
+      const response = await fetch(`http://localhost:8000/api/main/${id}`, {
+        method: 'PUT', // Use PUT method for updating
         headers: {
           'Content-Type': 'application/json',
         },
@@ -70,25 +110,24 @@ const MainFormSubmit = (props: { user: string }) => {
       const data = await response.json();
       console.log('Response:', data);
 
-      if (data.message === 'Record created successfully') {
+      if (data.message === 'Record updated successfully') {
         navigate('/');
       }
     } catch (error) {
-      console.error('Error creating record:', error);
+      console.error('Error updating record:', error);
     }
   };
 
   return (
     <div>
-      <h2>Main Form</h2>
+      <h2>Edit Form</h2>
       <form onSubmit={handleSubmit} className="form">
-        {/* ... (your existing inputs) */}
+        
+        
 
 
 
-
-
-        <label className="label">
+      <label className="label">
           Name:
           <input className="input" type="text" name="name" value={formData.name} onChange={handleInputChange} required />
         </label>
@@ -219,11 +258,8 @@ const MainFormSubmit = (props: { user: string }) => {
 
 
 
-
-
-
         <button type="submit" className="submit-button">
-          Submit
+          Update
         </button>
       </form>
     </div>

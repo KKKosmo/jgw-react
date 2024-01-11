@@ -60,11 +60,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
+var react_router_dom_1 = require("react-router-dom");
 var Home = function (_a) {
     var user = _a.user;
     var _b = (0, react_1.useState)([]), data = _b[0], setData = _b[1];
     var _c = (0, react_1.useState)('id'), sortColumn = _c[0], setSortColumn = _c[1];
     var _d = (0, react_1.useState)('asc'), sortOrder = _d[0], setSortOrder = _d[1];
+    var navigate = (0, react_router_dom_1.useNavigate)();
     var defaultOrders = {
         id: 'asc',
         dateInserted: 'desc', // Set to 'desc' for dateInserted
@@ -75,46 +77,81 @@ var Home = function (_a) {
         videoke: 'desc', // Set to 'desc' for videoke
         partial_payment: 'asc',
         full_payment: 'asc',
+        balance: 'desc',
         paid: 'asc',
         checkIn: 'desc', // Set to 'desc' for checkIn
         checkOut: 'desc', // Set to 'desc' for checkOut
         room: 'asc',
         user: 'asc',
     };
+    var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response, result, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder), {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: ".concat(response.status));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    result = _a.sent();
+                    setData(result || []);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    console.error('Error fetching data:', error_1.message);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
     (0, react_1.useEffect)(function () {
-        var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response, result, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder), {
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                                credentials: 'include',
-                            })];
-                    case 1:
-                        response = _a.sent();
-                        if (!response.ok) {
-                            throw new Error("HTTP error! Status: ".concat(response.status));
-                        }
-                        return [4 /*yield*/, response.json()];
-                    case 2:
-                        result = _a.sent();
-                        setData(result || []);
-                        return [3 /*break*/, 4];
-                    case 3:
-                        error_1 = _a.sent();
-                        console.error('Error fetching data:', error_1.message);
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        }); };
+        // Call fetchData when the component mounts or when sortColumn/sortOrder changes
         fetchData();
     }, [sortColumn, sortOrder]);
+    var handleEdit = function (id) {
+        navigate("/edit/".concat(id));
+    };
+    var handleDelete = function (id) { return __awaiter(void 0, void 0, void 0, function () {
+        var response, data_1, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main/".concat(id), {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data_1 = _a.sent();
+                    console.log('Response:', data_1);
+                    // Reload data after deletion
+                    fetchData();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    console.error('Error deleting record:', error_2);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
     var handleSort = function (column) {
         if (column != sortColumn) {
             setSortOrder(defaultOrders[column]);
@@ -135,31 +172,39 @@ var Home = function (_a) {
             react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); } }, "Videoke"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); } }, "Partial Payment"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); } }, "Full Payment"),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('balance'); } }, "Balance"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); } }, "Fully Paid"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); } }, "Check In"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); } }, "Check Out"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('room'); } }, "Room"),
             react_1.default.createElement("th", { onClick: function () { return handleSort('user'); } }, "User")));
     };
+    var renderRows = function () {
+        return data.map(function (item) { return (react_1.default.createElement("tr", { key: item.id },
+            react_1.default.createElement("td", null, item.id),
+            react_1.default.createElement("td", null, item.dateInserted),
+            react_1.default.createElement("td", null, item.name),
+            react_1.default.createElement("td", null, item.pax),
+            react_1.default.createElement("td", null, item.vehicle),
+            react_1.default.createElement("td", null, item.pets ? 'Yes' : 'No'),
+            react_1.default.createElement("td", null, item.videoke ? 'Yes' : 'No'),
+            react_1.default.createElement("td", null, item.partial_payment),
+            react_1.default.createElement("td", null, item.full_payment),
+            react_1.default.createElement("td", null, item.balance),
+            react_1.default.createElement("td", null, item.paid ? 'Yes' : 'No'),
+            react_1.default.createElement("td", null, item.checkIn),
+            react_1.default.createElement("td", null, item.checkOut),
+            react_1.default.createElement("td", null, item.room),
+            react_1.default.createElement("td", null, item.user),
+            react_1.default.createElement("td", null,
+                react_1.default.createElement("button", { onClick: function () { return handleEdit(item.id); } }, "Edit"),
+                react_1.default.createElement("button", { onClick: function () { return handleDelete(item.id); } }, "Delete")))); });
+    };
     return (react_1.default.createElement("div", null,
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
         react_1.default.createElement("table", null,
             react_1.default.createElement("thead", null, renderHeader()),
-            react_1.default.createElement("tbody", null, data.map(function (item) { return (react_1.default.createElement("tr", { key: item.id },
-                react_1.default.createElement("td", null, item.id),
-                react_1.default.createElement("td", null, item.dateInserted),
-                react_1.default.createElement("td", null, item.name),
-                react_1.default.createElement("td", null, item.pax),
-                react_1.default.createElement("td", null, item.vehicle),
-                react_1.default.createElement("td", null, item.pets ? 'Yes' : 'No'),
-                react_1.default.createElement("td", null, item.videoke ? 'Yes' : 'No'),
-                react_1.default.createElement("td", null, item.partial_payment),
-                react_1.default.createElement("td", null, item.full_payment),
-                react_1.default.createElement("td", null, item.paid ? 'Yes' : 'No'),
-                react_1.default.createElement("td", null, item.checkIn),
-                react_1.default.createElement("td", null, item.checkOut),
-                react_1.default.createElement("td", null, item.room),
-                react_1.default.createElement("td", null, item.user))); })))));
+            react_1.default.createElement("tbody", null, renderRows()))));
 };
 exports.default = Home;

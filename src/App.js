@@ -5,6 +5,7 @@ import Login from "./dist/Login";
 import Nav from "./dist/Nav";
 import Home from "./dist/Home";
 import MainFormSubmit from "./dist/MainFormSubmit";
+import EditForm from './dist/EditForm';
 
 function App() {
     const [user, setUser] = useState('');
@@ -35,6 +36,7 @@ function App() {
                         <Route path="/" element={<Home user={user} />}></Route>
                         <Route path="/login" element={<Login setUser={setUser} />}></Route>
                         <Route path="/mainFormSubmit" element={<MainFormSubmit user={user} />}></Route>
+                        <Route path="/edit/:id" element={<EditForm />} />
                     </Routes>
                 </main>
             </BrowserRouter>
