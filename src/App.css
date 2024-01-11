@@ -77,3 +77,39 @@
 .navText{
   color: white;
 }
+
+
+
+.days-row {
+  font-weight: bold;
+}
+.day-number-container {
+  font-size: 12px;
+  text-align: right;
+  margin-top: 5px; /* Adjust the top margin to your liking */
+  margin-right: 5px; /* Adjust the right margin to your liking */
+}
+
+.calendar-cell {
+  border: 1px solid #ccc; 
+  min-height: 100px;
+}
+
+.data{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.calendar-cell.available {
+  background-color: #aaffaa; /* Light green for available */
+}
+
+.calendar-cell.unavailable {
+  background-color: #ffaaaa; /* Light red for unavailable */
+}
+
+.calendar{
+  width: 100%;
+}

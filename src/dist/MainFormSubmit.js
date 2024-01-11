@@ -78,14 +78,31 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/components/MainFormSubmit.js
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
+var Calendar_1 = __importDefault(require("./Calendar"));
+// interface dataSet{
+//   checkIn: string;
+//   checkOut: string;
+//   room: Array<String>;
+// }
 var MainFormSubmit = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
     var user = props.user;
-    var _a = (0, react_1.useState)({
+    var _a = (0, react_1.useState)(function () {
+        return Array.from({ length: 42 }, function (_, index) { return ({
+            dayNumber: index + 1,
+            data: 'data,data,data,data,data,data,',
+            availability: index % 2 === 0,
+        }); });
+    }), calendarData = _a[0], setCalendarData = _a[1];
+    var _b = (0, react_1.useState)(), currentSet = _b[0], setCurrentSet = _b[1];
+    var _c = (0, react_1.useState)({
         user: user,
         name: '',
         pax: 0,
@@ -98,15 +115,59 @@ var MainFormSubmit = function (props) {
         checkIn: '',
         checkOut: '',
         room: '',
-    }), formData = _a[0], setFormData = _a[1];
-    var _b = (0, react_1.useState)([]), selectedRooms = _b[0], setSelectedRooms = _b[1];
+    }), formData = _c[0], setFormData = _c[1];
+    var _d = (0, react_1.useState)([]), selectedRooms = _d[0], setSelectedRooms = _d[1];
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
             var _a;
             return (__assign(__assign({}, prevData), (_a = {}, _a[name] = type === 'radio' ? value === 'true' : value, _a)));
         });
+        // AND BOTH ARE NOT EMPTY
+        if (type === 'date') {
+            if (formData.checkIn && formData.checkOut && formData.room) {
+                console.log(formData.checkIn);
+                console.log(formData.checkOut);
+                console.log(formData.room);
+                checkForm(formData.checkIn, formData.checkOut, formData.room);
+            }
+        }
     };
+    var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
+        var link, response, data, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    link = "http://localhost:8000/api/main/checkForm?startDate=".concat(startDate, "&endDate=").concat(endDate, "&room=").concat(room);
+                    return [4 /*yield*/, fetch(link, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: ".concat(response.status));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data = _a.sent();
+                    // setCurrentSet(data.message.room);
+                    // setCurrentSet(data);
+                    console.log(data.available);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    console.error('Error fetching data from the API:', error_1);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
     var handleCheckboxChange = function (e) {
         var _a = e.target, name = _a.name, checked = _a.checked;
         if (name === 'exclusive' && checked) {
@@ -122,14 +183,22 @@ var MainFormSubmit = function (props) {
                 }
             });
         }
+        console.log("formatted = " + selectedRooms);
+        formData.room = selectedRooms.join(',');
+        if (formData.checkIn && formData.checkOut && formData.room) {
+            console.log(formData.checkIn);
+            console.log(formData.checkOut);
+            console.log(formData.room);
+            checkForm(formData.checkIn, formData.checkOut, formData.room);
+        }
     };
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var formattedRoom, response, data, error_1;
+        var formattedRoom, response, data, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     e.preventDefault();
-                    formattedRoom = selectedRooms.join(', ');
+                    formattedRoom = selectedRooms.join(',');
                     console.log(formattedRoom);
                     _a.label = 1;
                 case 1:
@@ -155,10 +224,66 @@ var MainFormSubmit = function (props) {
                     }
                     return [3 /*break*/, 5];
                 case 4:
-                    error_1 = _a.sent();
-                    console.error('Error creating record:', error_1);
+                    error_2 = _a.sent();
+                    console.error('Error creating record:', error_2);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response, data, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main")];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data = _a.sent();
+                    setCalendarData(data);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_3 = _a.sent();
+                    console.error('Error fetching data from the API:', error_3);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
+        var response, data, error_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main/getNewSet?startDate=".concat(startDate, "&endDate=").concat(endDate), {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: ".concat(response.status));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data = _a.sent();
+                    // setCurrentSet(data.message.room);
+                    // setCurrentSet(data);
+                    console.log(data[0].room);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_4 = _a.sent();
+                    console.error('Error fetching data from the API:', error_4);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     }); };
@@ -212,6 +337,7 @@ var MainFormSubmit = function (props) {
                 "KUBO 2",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "exclusive", checked: selectedRooms.includes('EXCLUSIVE'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
-            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit"))));
+            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit")),
+        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData })));
 };
 exports.default = MainFormSubmit;
