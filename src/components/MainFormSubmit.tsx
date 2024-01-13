@@ -10,16 +10,10 @@ interface CalendarData {
   availability: boolean;
 }
 
-// interface dataSet{
-//   checkIn: string;
-//   checkOut: string;
-//   room: Array<String>;
-// }
-
-
 const MainFormSubmit = (props: { user: string }) => {
   const navigate = useNavigate();
   const { user } = props;
+
   const [calendarData, setCalendarData] = useState<CalendarData[]>(() =>
     Array.from({ length: 42 }, (_, index) => ({
       dayNumber: index + 1,
@@ -27,9 +21,6 @@ const MainFormSubmit = (props: { user: string }) => {
       availability: index % 2 === 0,
     }))
   );
-  const [currentSet, setCurrentSet] = useState<Array<String>>();
-
-
 
   const [formData, setFormData] = useState({
     user: user,
@@ -56,51 +47,11 @@ const MainFormSubmit = (props: { user: string }) => {
       [name]: type === 'radio' ? value === 'true' : value,
     }));
 
-// AND BOTH ARE NOT EMPTY
-    if(type === 'date'){
-    
-      if(formData.checkIn && formData.checkOut && formData.room){
-        console.log(formData.checkIn);
-        console.log(formData.checkOut);
-        console.log(formData.room);
-        checkForm(formData.checkIn, formData.checkOut, formData.room);
-      }
-    }
   };
-
-
-  const checkForm = async (startDate: string, endDate: string, room: string) => {
-    try {
-      const link = `http://localhost:8000/api/main/checkForm?startDate=${startDate}&endDate=${endDate}&room=${room}`;
-      // console.log(link);
-      const response = await fetch(link, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      
-      // setCurrentSet(data.message.room);
-      // setCurrentSet(data);
-      console.log(data.available);
-    } catch (error) {
-      console.error('Error fetching data from the API:', error);
-    }
-  };
-
-
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-  
+
     if (name === 'exclusive' && checked) {
       setSelectedRooms(['EXCLUSIVE']);
     } else {
@@ -112,15 +63,47 @@ const MainFormSubmit = (props: { user: string }) => {
         }
       });
     }
-    console.log("formatted = " + selectedRooms)
-    formData.room = selectedRooms.join(',');
+  };
 
-    
-    if(formData.checkIn && formData.checkOut && formData.room){
-      console.log(formData.checkIn);
-      console.log(formData.checkOut);
-      console.log(formData.room);
-      checkForm(formData.checkIn, formData.checkOut, formData.room);
+  // useEffect(() => {
+  //   formData.room = selectedRooms.join(',');
+
+  //   if (formData.checkIn && formData.checkOut && formData.room) {
+  //     console.log(formData.room);
+  //      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+  //   }
+  // }, [selectedRooms, formData.checkIn, formData.checkOut, formData.room]);
+
+  const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
+    try {
+      const link = `http://localhost:8000/api/main/checkForm?startDate=${startDate}&endDate=${endDate}&room=${room}`;
+      const response = await fetch(link, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+
+      if (data.available === 'true') {
+        return true;
+      } else if (data.available === 'false') {
+        return false;
+      } else {
+        throw new Error(`Unexpected response: ${data.available}`);
+      }
+
+      // return data.available === 'true';
+    } catch (error) {
+      console.error('Error fetching data from the API:', error);
+      return false; // Return false in case of an error
     }
   };
   
@@ -130,69 +113,38 @@ const MainFormSubmit = (props: { user: string }) => {
 
     let formattedRoom = selectedRooms.join(',');
     console.log(formattedRoom);
+    formData.room = formattedRoom;
 
     try {
-      formData.room = formattedRoom;
-      formData.user = user;
-      const response = await fetch('http://localhost:8000/api/main', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      console.log('Response:', data);
-
-      if (data.message === 'Record created successfully') {
-        navigate('/');
+      if(await checkForm(formData.checkIn, formData.checkOut, formData.room)){
+        console.log("here1");
+        formData.user = user;
+        const response = await fetch('http://localhost:8000/api/main', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData),
+        });
+  
+        const data = await response.json();
+        console.log('Response:', data);
+  
+        if (data.message === 'Record created successfully') {
+          navigate('/');
+        }
+      }
+      else{
+        console.log("here2");
+        alert("not available");
       }
     } catch (error) {
       console.error('Error creating record:', error);
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/main`);
-      const data = await response.json();
-      setCalendarData(data);
-    } catch (error) {
-      console.error('Error fetching data from the API:', error);
-    }
-  };  
-  
-
-
-
-  const getNewSet = async (startDate: string, endDate: string) => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/main/getNewSet?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      
-      // setCurrentSet(data.message.room);
-      // setCurrentSet(data);
-      console.log(data[0].room);
-    } catch (error) {
-      console.error('Error fetching data from the API:', error);
-    }
-  };
-  
-
+  // Rest of the code remains unchanged
 
   return (
     <div>
@@ -323,8 +275,8 @@ const MainFormSubmit = (props: { user: string }) => {
         </button>
       </form>
 
-      <Calendar calendarData={calendarData} />
 
+      <Calendar calendarData={calendarData} />
     </div>
   );
 };

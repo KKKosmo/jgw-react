@@ -86,11 +86,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
 var Calendar_1 = __importDefault(require("./Calendar"));
-// interface dataSet{
-//   checkIn: string;
-//   checkOut: string;
-//   room: Array<String>;
-// }
 var MainFormSubmit = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
     var user = props.user;
@@ -101,8 +96,7 @@ var MainFormSubmit = function (props) {
             availability: index % 2 === 0,
         }); });
     }), calendarData = _a[0], setCalendarData = _a[1];
-    var _b = (0, react_1.useState)(), currentSet = _b[0], setCurrentSet = _b[1];
-    var _c = (0, react_1.useState)({
+    var _b = (0, react_1.useState)({
         user: user,
         name: '',
         pax: 0,
@@ -115,24 +109,38 @@ var MainFormSubmit = function (props) {
         checkIn: '',
         checkOut: '',
         room: '',
-    }), formData = _c[0], setFormData = _c[1];
-    var _d = (0, react_1.useState)([]), selectedRooms = _d[0], setSelectedRooms = _d[1];
+    }), formData = _b[0], setFormData = _b[1];
+    var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
             var _a;
             return (__assign(__assign({}, prevData), (_a = {}, _a[name] = type === 'radio' ? value === 'true' : value, _a)));
         });
-        // AND BOTH ARE NOT EMPTY
-        if (type === 'date') {
-            if (formData.checkIn && formData.checkOut && formData.room) {
-                console.log(formData.checkIn);
-                console.log(formData.checkOut);
-                console.log(formData.room);
-                checkForm(formData.checkIn, formData.checkOut, formData.room);
-            }
+    };
+    var handleCheckboxChange = function (e) {
+        var _a = e.target, name = _a.name, checked = _a.checked;
+        if (name === 'exclusive' && checked) {
+            setSelectedRooms(['EXCLUSIVE']);
+        }
+        else {
+            setSelectedRooms(function (prevRooms) {
+                if (checked) {
+                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'EXCLUSIVE'; }), true), [name.toUpperCase()], false);
+                }
+                else {
+                    return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
+                }
+            });
         }
     };
+    // useEffect(() => {
+    //   formData.room = selectedRooms.join(',');
+    //   if (formData.checkIn && formData.checkOut && formData.room) {
+    //     console.log(formData.room);
+    //      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+    //   }
+    // }, [selectedRooms, formData.checkIn, formData.checkOut, formData.room]);
     var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
         var link, response, data, error_1;
         return __generator(this, function (_a) {
@@ -156,42 +164,24 @@ var MainFormSubmit = function (props) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     data = _a.sent();
-                    // setCurrentSet(data.message.room);
-                    // setCurrentSet(data);
-                    console.log(data.available);
+                    if (data.available === 'true') {
+                        return [2 /*return*/, true];
+                    }
+                    else if (data.available === 'false') {
+                        return [2 /*return*/, false];
+                    }
+                    else {
+                        throw new Error("Unexpected response: ".concat(data.available));
+                    }
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
                     console.error('Error fetching data from the API:', error_1);
-                    return [3 /*break*/, 4];
+                    return [2 /*return*/, false]; // Return false in case of an error
                 case 4: return [2 /*return*/];
             }
         });
     }); };
-    var handleCheckboxChange = function (e) {
-        var _a = e.target, name = _a.name, checked = _a.checked;
-        if (name === 'exclusive' && checked) {
-            setSelectedRooms(['EXCLUSIVE']);
-        }
-        else {
-            setSelectedRooms(function (prevRooms) {
-                if (checked) {
-                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'EXCLUSIVE'; }), true), [name.toUpperCase()], false);
-                }
-                else {
-                    return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
-                }
-            });
-        }
-        console.log("formatted = " + selectedRooms);
-        formData.room = selectedRooms.join(',');
-        if (formData.checkIn && formData.checkOut && formData.room) {
-            console.log(formData.checkIn);
-            console.log(formData.checkOut);
-            console.log(formData.room);
-            checkForm(formData.checkIn, formData.checkOut, formData.room);
-        }
-    };
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_2;
         return __generator(this, function (_a) {
@@ -200,10 +190,14 @@ var MainFormSubmit = function (props) {
                     e.preventDefault();
                     formattedRoom = selectedRooms.join(',');
                     console.log(formattedRoom);
+                    formData.room = formattedRoom;
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 4, , 5]);
-                    formData.room = formattedRoom;
+                    _a.trys.push([1, 7, , 8]);
+                    return [4 /*yield*/, checkForm(formData.checkIn, formData.checkOut, formData.room)];
+                case 2:
+                    if (!_a.sent()) return [3 /*break*/, 5];
+                    console.log("here1");
                     formData.user = user;
                     return [4 /*yield*/, fetch('http://localhost:8000/api/main', {
                             method: 'POST',
@@ -213,80 +207,30 @@ var MainFormSubmit = function (props) {
                             credentials: 'include',
                             body: JSON.stringify(formData),
                         })];
-                case 2:
+                case 3:
                     response = _a.sent();
                     return [4 /*yield*/, response.json()];
-                case 3:
+                case 4:
                     data = _a.sent();
                     console.log('Response:', data);
                     if (data.message === 'Record created successfully') {
                         navigate('/');
                     }
-                    return [3 /*break*/, 5];
-                case 4:
+                    return [3 /*break*/, 6];
+                case 5:
+                    console.log("here2");
+                    alert("not available");
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 8];
+                case 7:
                     error_2 = _a.sent();
                     console.error('Error creating record:', error_2);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
             }
         });
     }); };
-    var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response, data, error_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch("http://localhost:8000/api/main")];
-                case 1:
-                    response = _a.sent();
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    data = _a.sent();
-                    setCalendarData(data);
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_3 = _a.sent();
-                    console.error('Error fetching data from the API:', error_3);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); };
-    var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
-        var response, data, error_4;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch("http://localhost:8000/api/main/getNewSet?startDate=".concat(startDate, "&endDate=").concat(endDate), {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                            credentials: 'include',
-                        })];
-                case 1:
-                    response = _a.sent();
-                    if (!response.ok) {
-                        throw new Error("HTTP error! Status: ".concat(response.status));
-                    }
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    data = _a.sent();
-                    // setCurrentSet(data.message.room);
-                    // setCurrentSet(data);
-                    console.log(data[0].room);
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_4 = _a.sent();
-                    console.error('Error fetching data from the API:', error_4);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); };
+    // Rest of the code remains unchanged
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("h2", null, "Main Form"),
         react_1.default.createElement("form", { onSubmit: handleSubmit, className: "form" },
