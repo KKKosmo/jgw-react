@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Calendar from './Calendar';
 
 interface CalendarData {
-  dayNumber: number;
+  dayNumber: string;
   data: string;
   availability: boolean;
 }
@@ -16,7 +16,7 @@ const MainFormSubmit = (props: { user: string }) => {
 
   const [calendarData, setCalendarData] = useState<CalendarData[]>(() =>
     Array.from({ length: 42 }, (_, index) => ({
-      dayNumber: index + 1,
+      dayNumber: String(index + 1),
       data: 'data,data,data,data,data,data,',
       availability: index % 2 === 0,
     }))
@@ -128,11 +128,28 @@ const MainFormSubmit = (props: { user: string }) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
-      const data = await response.json();
 
-      console.log(data);
+      interface ApiResponse {
+        dayNumber: string[];
+        data: string[];
+      }
 
+      const jsonData: ApiResponse = await response.json();
+      
+      const updatedCalendarData = calendarData.map((item, index) => {
+        const dayNumber = jsonData.dayNumber[index] || '';
+        const data = jsonData.data[index] || '';
+        
+        return {
+          dayNumber,
+          data,
+          availability: item.availability,
+        };
+      });
+      
+      setCalendarData(updatedCalendarData);
+
+    console.log(jsonData);
 
     } catch (error) {
       console.error('Error fetching data from the API:', error);
@@ -140,11 +157,7 @@ const MainFormSubmit = (props: { user: string }) => {
   };
 
 
-
-
-
   useEffect(() => {
-
     if (formData.checkIn && formData.checkOut) {
        getNewSet(formData.checkIn, formData.checkOut);
     }

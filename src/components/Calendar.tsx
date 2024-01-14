@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CalendarData {
-  dayNumber: number;
+  dayNumber: string;
   data: string;
   availability: boolean;
 }

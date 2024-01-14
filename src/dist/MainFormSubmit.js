@@ -91,7 +91,7 @@ var MainFormSubmit = function (props) {
     var user = props.user;
     var _a = (0, react_1.useState)(function () {
         return Array.from({ length: 42 }, function (_, index) { return ({
-            dayNumber: index + 1,
+            dayNumber: String(index + 1),
             data: 'data,data,data,data,data,data,',
             availability: index % 2 === 0,
         }); });
@@ -183,7 +183,7 @@ var MainFormSubmit = function (props) {
         });
     }); };
     var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
-        var link, response, data, error_2;
+        var link, response, jsonData_1, updatedCalendarData, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -204,8 +204,18 @@ var MainFormSubmit = function (props) {
                     }
                     return [4 /*yield*/, response.json()];
                 case 2:
-                    data = _a.sent();
-                    console.log(data);
+                    jsonData_1 = _a.sent();
+                    updatedCalendarData = calendarData.map(function (item, index) {
+                        var dayNumber = jsonData_1.dayNumber[index] || '';
+                        var data = jsonData_1.data[index] || '';
+                        return {
+                            dayNumber: dayNumber,
+                            data: data,
+                            availability: item.availability,
+                        };
+                    });
+                    setCalendarData(updatedCalendarData);
+                    console.log(jsonData_1);
                     return [3 /*break*/, 4];
                 case 3:
                     error_2 = _a.sent();
