@@ -52,12 +52,12 @@ const MainFormSubmit = (props: { user: string }) => {
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
 
-    if (name === 'exclusive' && checked) {
-      setSelectedRooms(['EXCLUSIVE']);
+    if (name === 'e' && checked) {
+      setSelectedRooms(['E']);
     } else {
       setSelectedRooms((prevRooms) => {
         if (checked) {
-          return [...prevRooms.filter((room) => room !== 'EXCLUSIVE'), name.toUpperCase()];
+          return [...prevRooms.filter((room) => room !== 'E'), name.toUpperCase()];
         } else {
           return prevRooms.filter((room) => room !== name.toUpperCase());
         }
@@ -65,14 +65,14 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   };
 
-  // useEffect(() => {
-  //   formData.room = selectedRooms.join(',');
+  useEffect(() => {
+    formData.room = selectedRooms.join(',');
 
-  //   if (formData.checkIn && formData.checkOut && formData.room) {
-  //     console.log(formData.room);
-  //      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-  //   }
-  // }, [selectedRooms, formData.checkIn, formData.checkOut, formData.room]);
+    if (formData.checkIn && formData.checkOut && formData.room) {
+      console.log(formData.room);
+       console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+    }
+  }, [selectedRooms, formData.checkIn, formData.checkOut]);
 
   const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
     try {
@@ -108,6 +108,56 @@ const MainFormSubmit = (props: { user: string }) => {
   };
   
 
+
+
+
+
+
+  const getNewSet = async (startDate: string, endDate: string) => {
+    try {
+      const link = `http://localhost:8000/api/main/getNewSet?startDate=${startDate}&endDate=${endDate}`;
+      const response = await fetch(link, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+
+      console.log(data);
+
+
+    } catch (error) {
+      console.error('Error fetching data from the API:', error);
+    }
+  };
+
+
+
+
+
+  useEffect(() => {
+
+    if (formData.checkIn && formData.checkOut) {
+       getNewSet(formData.checkIn, formData.checkOut);
+    }
+  }, [formData.checkIn, formData.checkOut]);
+
+
+
+
+
+
+
+
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -143,8 +193,6 @@ const MainFormSubmit = (props: { user: string }) => {
       console.error('Error creating record:', error);
     }
   };
-
-  // Rest of the code remains unchanged
 
   return (
     <div>
@@ -264,8 +312,8 @@ const MainFormSubmit = (props: { user: string }) => {
           <input
             className="input"
             type="checkbox"
-            name="exclusive"
-            checked={selectedRooms.includes('EXCLUSIVE')}
+            name="e"
+            checked={selectedRooms.includes('E')}
             onChange={handleCheckboxChange}
           />
           EXCLUSIVE

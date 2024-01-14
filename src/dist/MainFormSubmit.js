@@ -120,13 +120,13 @@ var MainFormSubmit = function (props) {
     };
     var handleCheckboxChange = function (e) {
         var _a = e.target, name = _a.name, checked = _a.checked;
-        if (name === 'exclusive' && checked) {
-            setSelectedRooms(['EXCLUSIVE']);
+        if (name === 'e' && checked) {
+            setSelectedRooms(['E']);
         }
         else {
             setSelectedRooms(function (prevRooms) {
                 if (checked) {
-                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'EXCLUSIVE'; }), true), [name.toUpperCase()], false);
+                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'E'; }), true), [name.toUpperCase()], false);
                 }
                 else {
                     return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
@@ -134,13 +134,13 @@ var MainFormSubmit = function (props) {
             });
         }
     };
-    // useEffect(() => {
-    //   formData.room = selectedRooms.join(',');
-    //   if (formData.checkIn && formData.checkOut && formData.room) {
-    //     console.log(formData.room);
-    //      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-    //   }
-    // }, [selectedRooms, formData.checkIn, formData.checkOut, formData.room]);
+    (0, react_1.useEffect)(function () {
+        formData.room = selectedRooms.join(',');
+        if (formData.checkIn && formData.checkOut && formData.room) {
+            console.log(formData.room);
+            console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+        }
+    }, [selectedRooms, formData.checkIn, formData.checkOut]);
     var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
         var link, response, data, error_1;
         return __generator(this, function (_a) {
@@ -182,8 +182,46 @@ var MainFormSubmit = function (props) {
             }
         });
     }); };
+    var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
+        var link, response, data, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    link = "http://localhost:8000/api/main/getNewSet?startDate=".concat(startDate, "&endDate=").concat(endDate);
+                    return [4 /*yield*/, fetch(link, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: ".concat(response.status));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data = _a.sent();
+                    console.log(data);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    console.error('Error fetching data from the API:', error_2);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    (0, react_1.useEffect)(function () {
+        if (formData.checkIn && formData.checkOut) {
+            getNewSet(formData.checkIn, formData.checkOut);
+        }
+    }, [formData.checkIn, formData.checkOut]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var formattedRoom, response, data, error_2;
+        var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -223,14 +261,13 @@ var MainFormSubmit = function (props) {
                     _a.label = 6;
                 case 6: return [3 /*break*/, 8];
                 case 7:
-                    error_2 = _a.sent();
-                    console.error('Error creating record:', error_2);
+                    error_3 = _a.sent();
+                    console.error('Error creating record:', error_3);
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
         });
     }); };
-    // Rest of the code remains unchanged
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("h2", null, "Main Form"),
         react_1.default.createElement("form", { onSubmit: handleSubmit, className: "form" },
@@ -279,7 +316,7 @@ var MainFormSubmit = function (props) {
                 "KUBO 1",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "k2", checked: selectedRooms.includes('K2'), onChange: handleCheckboxChange }),
                 "KUBO 2",
-                react_1.default.createElement("input", { className: "input", type: "checkbox", name: "exclusive", checked: selectedRooms.includes('EXCLUSIVE'), onChange: handleCheckboxChange }),
+                react_1.default.createElement("input", { className: "input", type: "checkbox", name: "e", checked: selectedRooms.includes('E'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
             react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit")),
         react_1.default.createElement(Calendar_1.default, { calendarData: calendarData })));
