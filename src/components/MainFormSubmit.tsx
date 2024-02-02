@@ -12,7 +12,16 @@ interface CalendarData {
 
 const MainFormSubmit = (props: { user: string }) => {
   const navigate = useNavigate();
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+
   const { user } = props;
+
+  const [calendarMonth, setCalendarMonth] = useState<string>();
 
   const [calendarData, setCalendarData] = useState<CalendarData[]>(() =>
     Array.from({ length: 42 }, (_, index) => ({
@@ -39,6 +48,16 @@ const MainFormSubmit = (props: { user: string }) => {
 
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
 
+  const currentDate = new Date();
+
+
+  const day = currentDate.getDate();
+  const month = currentDate.getMonth() + 1;
+  const year = currentDate.getFullYear();
+  const formattedDate = `${day < 10 ? '0' + day : day}-${month < 10 ? '0' + month : month}-${year}`;
+  const [tempDate, setTempDate] = useState<string>(formattedDate);
+
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
 
@@ -46,6 +65,7 @@ const MainFormSubmit = (props: { user: string }) => {
       ...prevData,
       [name]: type === 'radio' ? value === 'true' : value,
     }));
+
 
   };
 
@@ -70,7 +90,7 @@ const MainFormSubmit = (props: { user: string }) => {
 
     if (formData.checkIn && formData.checkOut && formData.room) {
       console.log(formData.room);
-       console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
     }
   }, [selectedRooms, formData.checkIn, formData.checkOut]);
 
@@ -85,11 +105,11 @@ const MainFormSubmit = (props: { user: string }) => {
         },
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
 
       if (data.available === 'true') {
@@ -106,7 +126,7 @@ const MainFormSubmit = (props: { user: string }) => {
       return false; // Return false in case of an error
     }
   };
-  
+
 
 
 
@@ -124,7 +144,7 @@ const MainFormSubmit = (props: { user: string }) => {
         },
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -135,21 +155,22 @@ const MainFormSubmit = (props: { user: string }) => {
       }
 
       const jsonData: ApiResponse = await response.json();
-      
+
       const updatedCalendarData = calendarData.map((item, index) => {
         const dayNumber = jsonData.dayNumber[index] || '';
         const data = jsonData.data[index] || '';
-        
+
         return {
           dayNumber,
           data,
           availability: item.availability,
         };
       });
+
       
       setCalendarData(updatedCalendarData);
 
-    console.log(jsonData);
+      console.log(jsonData);
 
     } catch (error) {
       console.error('Error fetching data from the API:', error);
@@ -159,9 +180,49 @@ const MainFormSubmit = (props: { user: string }) => {
 
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
-       getNewSet(formData.checkIn, formData.checkOut);
+      const checkInDate = new Date(formData.checkIn);
+      const checkOutDate = new Date(formData.checkOut);
+
+      if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+        getNewSet(formData.checkIn, formData.checkOut);
+      }
+      else {
+        getNewSet(formData.checkIn, formData.checkIn);
+      }
+
+      const dateObject = new Date(formData.checkIn);
+      const monthIndex = dateObject.getMonth();
+
+      setCalendarMonth(monthNames[monthIndex]);
     }
-  }, [formData.checkIn, formData.checkOut]);
+  }, [formData.checkIn]);
+
+  useEffect(() => {
+    if (formData.checkIn && formData.checkOut) {
+      const checkInDate = new Date(formData.checkIn);
+      const checkOutDate = new Date(formData.checkOut);
+
+      if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+        getNewSet(formData.checkIn, formData.checkOut);
+      }
+      else {
+        getNewSet(formData.checkOut, formData.checkOut);
+      }
+      
+
+
+      const dateObject = new Date(formData.checkOut);
+      const monthIndex = dateObject.getMonth();
+
+      setCalendarMonth(monthNames[monthIndex]);
+    }
+  }, [formData.checkOut]);
+
+  // useEffect(() => {
+  //   if (formData.checkIn && formData.checkOut) {
+  //      getNewSet(formData.checkIn, formData.checkOut);
+  //   }
+  // }, [formData.checkIn, formData.checkOut]);
 
 
 
@@ -170,7 +231,7 @@ const MainFormSubmit = (props: { user: string }) => {
 
 
 
-  
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -179,7 +240,7 @@ const MainFormSubmit = (props: { user: string }) => {
     formData.room = formattedRoom;
 
     try {
-      if(await checkForm(formData.checkIn, formData.checkOut, formData.room)){
+      if (await checkForm(formData.checkIn, formData.checkOut, formData.room)) {
         console.log("here1");
         formData.user = user;
         const response = await fetch('http://localhost:8000/api/main', {
@@ -190,20 +251,20 @@ const MainFormSubmit = (props: { user: string }) => {
           credentials: 'include',
           body: JSON.stringify(formData),
         });
-  
+
         const data = await response.json();
         console.log('Response:', data);
-  
+
         if (data.message === 'Record created successfully') {
           navigate('/');
         }
       }
-      else{
+      else {
         console.log("here2");
         alert("not available");
       }
     } catch (error) {
-      console.error('Error creating record:', error);
+      alert(error);
     }
   };
 
@@ -336,8 +397,8 @@ const MainFormSubmit = (props: { user: string }) => {
         </button>
       </form>
 
+      <Calendar calendarData={calendarData} calendarMonth={calendarMonth} />
 
-      <Calendar calendarData={calendarData} />
     </div>
   );
 };

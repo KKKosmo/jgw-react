@@ -88,15 +88,20 @@ var react_router_dom_1 = require("react-router-dom");
 var Calendar_1 = __importDefault(require("./Calendar"));
 var MainFormSubmit = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
+    var monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
     var user = props.user;
-    var _a = (0, react_1.useState)(function () {
+    var _a = (0, react_1.useState)(), calendarMonth = _a[0], setCalendarMonth = _a[1];
+    var _b = (0, react_1.useState)(function () {
         return Array.from({ length: 42 }, function (_, index) { return ({
             dayNumber: String(index + 1),
             data: 'data,data,data,data,data,data,',
             availability: index % 2 === 0,
         }); });
-    }), calendarData = _a[0], setCalendarData = _a[1];
-    var _b = (0, react_1.useState)({
+    }), calendarData = _b[0], setCalendarData = _b[1];
+    var _c = (0, react_1.useState)({
         user: user,
         name: '',
         pax: 0,
@@ -109,8 +114,14 @@ var MainFormSubmit = function (props) {
         checkIn: '',
         checkOut: '',
         room: '',
-    }), formData = _b[0], setFormData = _b[1];
-    var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
+    }), formData = _c[0], setFormData = _c[1];
+    var _d = (0, react_1.useState)([]), selectedRooms = _d[0], setSelectedRooms = _d[1];
+    var currentDate = new Date();
+    var day = currentDate.getDate();
+    var month = currentDate.getMonth() + 1;
+    var year = currentDate.getFullYear();
+    var formattedDate = "".concat(day < 10 ? '0' + day : day, "-").concat(month < 10 ? '0' + month : month, "-").concat(year);
+    var _e = (0, react_1.useState)(formattedDate), tempDate = _e[0], setTempDate = _e[1];
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -227,9 +238,39 @@ var MainFormSubmit = function (props) {
     }); };
     (0, react_1.useEffect)(function () {
         if (formData.checkIn && formData.checkOut) {
-            getNewSet(formData.checkIn, formData.checkOut);
+            var checkInDate = new Date(formData.checkIn);
+            var checkOutDate = new Date(formData.checkOut);
+            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                getNewSet(formData.checkIn, formData.checkOut);
+            }
+            else {
+                getNewSet(formData.checkIn, formData.checkIn);
+            }
+            var dateObject = new Date(formData.checkIn);
+            var monthIndex = dateObject.getMonth();
+            setCalendarMonth(monthNames[monthIndex]);
         }
-    }, [formData.checkIn, formData.checkOut]);
+    }, [formData.checkIn]);
+    (0, react_1.useEffect)(function () {
+        if (formData.checkIn && formData.checkOut) {
+            var checkInDate = new Date(formData.checkIn);
+            var checkOutDate = new Date(formData.checkOut);
+            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                getNewSet(formData.checkIn, formData.checkOut);
+            }
+            else {
+                getNewSet(formData.checkOut, formData.checkOut);
+            }
+            var dateObject = new Date(formData.checkOut);
+            var monthIndex = dateObject.getMonth();
+            setCalendarMonth(monthNames[monthIndex]);
+        }
+    }, [formData.checkOut]);
+    // useEffect(() => {
+    //   if (formData.checkIn && formData.checkOut) {
+    //      getNewSet(formData.checkIn, formData.checkOut);
+    //   }
+    // }, [formData.checkIn, formData.checkOut]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {
@@ -272,7 +313,7 @@ var MainFormSubmit = function (props) {
                 case 6: return [3 /*break*/, 8];
                 case 7:
                     error_3 = _a.sent();
-                    console.error('Error creating record:', error_3);
+                    alert(error_3);
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
@@ -329,6 +370,6 @@ var MainFormSubmit = function (props) {
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "e", checked: selectedRooms.includes('E'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
             react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit")),
-        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData })));
+        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData, calendarMonth: calendarMonth })));
 };
 exports.default = MainFormSubmit;
