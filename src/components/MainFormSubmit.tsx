@@ -17,17 +17,15 @@ const MainFormSubmit = (props: { user: string }) => {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  
+
 
   const { user } = props;
-
-  const [calendarMonth, setCalendarMonth] = useState<string>();
 
   const [calendarData, setCalendarData] = useState<CalendarData[]>(() =>
     Array.from({ length: 42 }, (_, index) => ({
       dayNumber: String(index + 1),
       data: 'data,data,data,data,data,data,',
-      availability: index % 2 === 0,
+      availability: true,
     }))
   );
 
@@ -50,12 +48,7 @@ const MainFormSubmit = (props: { user: string }) => {
 
   const currentDate = new Date();
 
-
-  const day = currentDate.getDate();
-  const month = currentDate.getMonth() + 1;
-  const year = currentDate.getFullYear();
-  const formattedDate = `${day < 10 ? '0' + day : day}-${month < 10 ? '0' + month : month}-${year}`;
-  const [tempDate, setTempDate] = useState<string>(formattedDate);
+  const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
 
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -85,14 +78,6 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   };
 
-  // useEffect(() => {
-  //   formData.room = selectedRooms.join(',');
-
-  //   if (formData.checkIn && formData.checkOut && formData.room) {
-  //     console.log(formData.room);
-  //     console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-  //   }
-  // }, [selectedRooms, formData.checkIn, formData.checkOut]);
 
   const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
     try {
@@ -173,10 +158,8 @@ const MainFormSubmit = (props: { user: string }) => {
         };
       });
 
-      
-      setCalendarData(updatedCalendarData);
 
-      console.log(jsonData);
+      setCalendarData(updatedCalendarData);
 
     } catch (error) {
       console.error('Error fetching data from the API:', error);
@@ -214,7 +197,7 @@ const MainFormSubmit = (props: { user: string }) => {
       else {
         getNewSet(formData.checkOut, formData.checkOut);
       }
-      
+
 
 
       const dateObject = new Date(formData.checkOut);
@@ -224,15 +207,38 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   }, [formData.checkOut]);
 
-  // useEffect(() => {
-  //   if (formData.checkIn && formData.checkOut) {
-  //      getNewSet(formData.checkIn, formData.checkOut);
-  //   }
-  // }, [formData.checkIn, formData.checkOut]);
 
 
-
-
+  useEffect(() => {
+    let response: boolean[] = [];
+  
+    if (formData.checkIn && formData.checkOut) {
+      setCalendarData(prevCalendarData => {
+        const updatedData = prevCalendarData.map((item, index) => {
+          const blockData = item.data.split(',').map(item => item.trim());
+          let isBlockDataValid = true;
+  
+          for (const element of selectedRooms) {
+            if (!blockData.includes(element)) {
+              isBlockDataValid = false;
+              break; // This breaks out of the inner loop
+            }
+          }
+  
+          response.push(isBlockDataValid);
+  
+          return {
+            ...item,
+            availability: isBlockDataValid,
+          };
+        });
+  
+        console.log("color");
+        return updatedData;
+      });
+    }
+  }, [selectedRooms, formData.checkIn, formData.checkOut]);
+  
 
 
 
@@ -242,7 +248,6 @@ const MainFormSubmit = (props: { user: string }) => {
     e.preventDefault();
 
     let formattedRoom = selectedRooms.join(',');
-    console.log(formattedRoom);
     formData.room = formattedRoom;
 
     try {
@@ -258,7 +263,6 @@ const MainFormSubmit = (props: { user: string }) => {
         });
 
         const data = await response.json();
-        console.log('Response:', data);
 
         if (data.message === 'Record created successfully') {
           navigate('/');

@@ -93,15 +93,14 @@ var MainFormSubmit = function (props) {
         "July", "August", "September", "October", "November", "December"
     ];
     var user = props.user;
-    var _a = (0, react_1.useState)(), calendarMonth = _a[0], setCalendarMonth = _a[1];
-    var _b = (0, react_1.useState)(function () {
+    var _a = (0, react_1.useState)(function () {
         return Array.from({ length: 42 }, function (_, index) { return ({
             dayNumber: String(index + 1),
             data: 'data,data,data,data,data,data,',
-            availability: index % 2 === 0,
+            availability: true,
         }); });
-    }), calendarData = _b[0], setCalendarData = _b[1];
-    var _c = (0, react_1.useState)({
+    }), calendarData = _a[0], setCalendarData = _a[1];
+    var _b = (0, react_1.useState)({
         user: user,
         name: '',
         pax: 0,
@@ -114,14 +113,10 @@ var MainFormSubmit = function (props) {
         checkIn: '',
         checkOut: '',
         room: '',
-    }), formData = _c[0], setFormData = _c[1];
-    var _d = (0, react_1.useState)([]), selectedRooms = _d[0], setSelectedRooms = _d[1];
+    }), formData = _b[0], setFormData = _b[1];
+    var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
     var currentDate = new Date();
-    var day = currentDate.getDate();
-    var month = currentDate.getMonth() + 1;
-    var year = currentDate.getFullYear();
-    var formattedDate = "".concat(day < 10 ? '0' + day : day, "-").concat(month < 10 ? '0' + month : month, "-").concat(year);
-    var _e = (0, react_1.useState)(formattedDate), tempDate = _e[0], setTempDate = _e[1];
+    var _d = (0, react_1.useState)("".concat(monthNames[currentDate.getMonth()])), calendarMonth = _d[0], setCalendarMonth = _d[1];
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -145,13 +140,6 @@ var MainFormSubmit = function (props) {
             });
         }
     };
-    // useEffect(() => {
-    //   formData.room = selectedRooms.join(',');
-    //   if (formData.checkIn && formData.checkOut && formData.room) {
-    //     console.log(formData.room);
-    //     console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-    //   }
-    // }, [selectedRooms, formData.checkIn, formData.checkOut]);
     var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
         var link, response, errorData, errorMessage, data, error_1;
         return __generator(this, function (_a) {
@@ -231,7 +219,6 @@ var MainFormSubmit = function (props) {
                         };
                     });
                     setCalendarData(updatedCalendarData);
-                    console.log(jsonData_1);
                     return [3 /*break*/, 4];
                 case 3:
                     error_2 = _a.sent();
@@ -271,11 +258,28 @@ var MainFormSubmit = function (props) {
             setCalendarMonth(monthNames[monthIndex]);
         }
     }, [formData.checkOut]);
-    // useEffect(() => {
-    //   if (formData.checkIn && formData.checkOut) {
-    //      getNewSet(formData.checkIn, formData.checkOut);
-    //   }
-    // }, [formData.checkIn, formData.checkOut]);
+    (0, react_1.useEffect)(function () {
+        var response = [];
+        if (formData.checkIn && formData.checkOut) {
+            setCalendarData(function (prevCalendarData) {
+                var updatedData = prevCalendarData.map(function (item, index) {
+                    var blockData = item.data.split(',').map(function (item) { return item.trim(); });
+                    var isBlockDataValid = true;
+                    for (var _i = 0, selectedRooms_1 = selectedRooms; _i < selectedRooms_1.length; _i++) {
+                        var element = selectedRooms_1[_i];
+                        if (!blockData.includes(element)) {
+                            isBlockDataValid = false;
+                            break; // This breaks out of the inner loop
+                        }
+                    }
+                    response.push(isBlockDataValid);
+                    return __assign(__assign({}, item), { availability: isBlockDataValid });
+                });
+                console.log("color");
+                return updatedData;
+            });
+        }
+    }, [selectedRooms, formData.checkIn, formData.checkOut]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {
@@ -283,7 +287,6 @@ var MainFormSubmit = function (props) {
                 case 0:
                     e.preventDefault();
                     formattedRoom = selectedRooms.join(',');
-                    console.log(formattedRoom);
                     formData.room = formattedRoom;
                     _a.label = 1;
                 case 1:
@@ -305,7 +308,6 @@ var MainFormSubmit = function (props) {
                     return [4 /*yield*/, response.json()];
                 case 4:
                     data = _a.sent();
-                    console.log('Response:', data);
                     if (data.message === 'Record created successfully') {
                         navigate('/');
                     }
