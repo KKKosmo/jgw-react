@@ -85,14 +85,14 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   };
 
-  useEffect(() => {
-    formData.room = selectedRooms.join(',');
+  // useEffect(() => {
+  //   formData.room = selectedRooms.join(',');
 
-    if (formData.checkIn && formData.checkOut && formData.room) {
-      console.log(formData.room);
-      console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-    }
-  }, [selectedRooms, formData.checkIn, formData.checkOut]);
+  //   if (formData.checkIn && formData.checkOut && formData.room) {
+  //     console.log(formData.room);
+  //     console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+  //   }
+  // }, [selectedRooms, formData.checkIn, formData.checkOut]);
 
   const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
     try {
@@ -107,7 +107,11 @@ const MainFormSubmit = (props: { user: string }) => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const errorData = await response.json();
+        const errorMessage = errorData.error;
+
+        throw new Error(`${errorMessage}`);
       }
 
       const data = await response.json();
@@ -115,6 +119,7 @@ const MainFormSubmit = (props: { user: string }) => {
       if (data.available === 'true') {
         return true;
       } else if (data.available === 'false') {
+        alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
         return false;
       } else {
         throw new Error(`Unexpected response: ${data.available}`);
@@ -122,8 +127,9 @@ const MainFormSubmit = (props: { user: string }) => {
 
       // return data.available === 'true';
     } catch (error) {
-      console.error('Error fetching data from the API:', error);
-      return false; // Return false in case of an error
+      console.error('ERROR:', error);
+      alert(error);
+      return false;
     }
   };
 
@@ -241,7 +247,6 @@ const MainFormSubmit = (props: { user: string }) => {
 
     try {
       if (await checkForm(formData.checkIn, formData.checkOut, formData.room)) {
-        console.log("here1");
         formData.user = user;
         const response = await fetch('http://localhost:8000/api/main', {
           method: 'POST',
@@ -260,8 +265,7 @@ const MainFormSubmit = (props: { user: string }) => {
         }
       }
       else {
-        console.log("here2");
-        alert("not available");
+        // alert(errorMessage);
       }
     } catch (error) {
       alert(error);

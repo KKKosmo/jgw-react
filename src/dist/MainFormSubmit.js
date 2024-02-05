@@ -145,19 +145,19 @@ var MainFormSubmit = function (props) {
             });
         }
     };
-    (0, react_1.useEffect)(function () {
-        formData.room = selectedRooms.join(',');
-        if (formData.checkIn && formData.checkOut && formData.room) {
-            console.log(formData.room);
-            console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
-        }
-    }, [selectedRooms, formData.checkIn, formData.checkOut]);
+    // useEffect(() => {
+    //   formData.room = selectedRooms.join(',');
+    //   if (formData.checkIn && formData.checkOut && formData.room) {
+    //     console.log(formData.room);
+    //     console.log(checkForm(formData.checkIn, formData.checkOut, formData.room));
+    //   }
+    // }, [selectedRooms, formData.checkIn, formData.checkOut]);
     var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
-        var link, response, data, error_1;
+        var link, response, errorData, errorMessage, data, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 3, , 4]);
+                    _a.trys.push([0, 5, , 6]);
                     link = "http://localhost:8000/api/main/checkForm?startDate=".concat(startDate, "&endDate=").concat(endDate, "&room=").concat(room);
                     return [4 /*yield*/, fetch(link, {
                             method: 'GET',
@@ -169,27 +169,32 @@ var MainFormSubmit = function (props) {
                         })];
                 case 1:
                     response = _a.sent();
-                    if (!response.ok) {
-                        throw new Error("HTTP error! Status: ".concat(response.status));
-                    }
+                    if (!!response.ok) return [3 /*break*/, 3];
                     return [4 /*yield*/, response.json()];
                 case 2:
+                    errorData = _a.sent();
+                    errorMessage = errorData.error;
+                    throw new Error("".concat(errorMessage));
+                case 3: return [4 /*yield*/, response.json()];
+                case 4:
                     data = _a.sent();
                     if (data.available === 'true') {
                         return [2 /*return*/, true];
                     }
                     else if (data.available === 'false') {
+                        alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
                         return [2 /*return*/, false];
                     }
                     else {
                         throw new Error("Unexpected response: ".concat(data.available));
                     }
-                    return [3 /*break*/, 4];
-                case 3:
+                    return [3 /*break*/, 6];
+                case 5:
                     error_1 = _a.sent();
-                    console.error('Error fetching data from the API:', error_1);
-                    return [2 /*return*/, false]; // Return false in case of an error
-                case 4: return [2 /*return*/];
+                    console.error('ERROR:', error_1);
+                    alert(error_1);
+                    return [2 /*return*/, false];
+                case 6: return [2 /*return*/];
             }
         });
     }); };
@@ -282,11 +287,10 @@ var MainFormSubmit = function (props) {
                     formData.room = formattedRoom;
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 7, , 8]);
+                    _a.trys.push([1, 6, , 7]);
                     return [4 /*yield*/, checkForm(formData.checkIn, formData.checkOut, formData.room)];
                 case 2:
                     if (!_a.sent()) return [3 /*break*/, 5];
-                    console.log("here1");
                     formData.user = user;
                     return [4 /*yield*/, fetch('http://localhost:8000/api/main', {
                             method: 'POST',
@@ -305,17 +309,13 @@ var MainFormSubmit = function (props) {
                     if (data.message === 'Record created successfully') {
                         navigate('/');
                     }
-                    return [3 /*break*/, 6];
-                case 5:
-                    console.log("here2");
-                    alert("not available");
-                    _a.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
+                    return [3 /*break*/, 5];
+                case 5: return [3 /*break*/, 7];
+                case 6:
                     error_3 = _a.sent();
                     alert(error_3);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     }); };
