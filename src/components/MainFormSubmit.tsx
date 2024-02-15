@@ -135,36 +135,49 @@ const MainFormSubmit = (props: { user: string }) => {
         },
         credentials: 'include',
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
+  
       interface ApiResponse {
         dayNumber: string[];
         data: string[];
       }
-
+  
       const jsonData: ApiResponse = await response.json();
-
-      const updatedCalendarData = calendarData.map((item, index) => {
-        const dayNumber = jsonData.dayNumber[index] || '';
-        const data = jsonData.data[index] || '';
-
-        return {
-          dayNumber,
-          data,
-          availability: item.availability,
-        };
+  
+      setCalendarData(prevCalendarData => {
+        const updatedData = prevCalendarData.map((item, index) => {
+          const dayNumber = jsonData.dayNumber[index] || '';
+          const data = jsonData.data[index] || '';
+  
+          const blockData = data.split(',').map(item => item.trim());
+          let isBlockDataValid = true;
+  
+          for (const element of selectedRooms) {
+            if (!blockData.includes(element)) {
+              isBlockDataValid = false;
+              break;
+            }
+          }
+  
+          return {
+            ...item,
+            dayNumber,
+            data,
+            availability: isBlockDataValid,
+          };
+        });
+  
+        return updatedData;
       });
-
-
-      setCalendarData(updatedCalendarData);
-
+  
     } catch (error) {
       console.error('Error fetching data from the API:', error);
     }
   };
+  
 
 
   useEffect(() => {
@@ -208,41 +221,34 @@ const MainFormSubmit = (props: { user: string }) => {
   }, [formData.checkOut]);
 
 
-
   useEffect(() => {
-    let response: boolean[] = [];
-  
     if (formData.checkIn && formData.checkOut) {
       setCalendarData(prevCalendarData => {
-        const updatedData = prevCalendarData.map((item, index) => {
+        const updatedData = prevCalendarData.map(item => {
           const blockData = item.data.split(',').map(item => item.trim());
           let isBlockDataValid = true;
   
           for (const element of selectedRooms) {
             if (!blockData.includes(element)) {
               isBlockDataValid = false;
-              break; // This breaks out of the inner loop
+              break;
             }
           }
-  
-          response.push(isBlockDataValid);
   
           return {
             ...item,
             availability: isBlockDataValid,
           };
         });
-  
-        console.log("color");
         return updatedData;
       });
     }
-  }, [selectedRooms, formData.checkIn, formData.checkOut]);
+  }, [selectedRooms]);
+
+  useEffect(() => {
+    console.log('yourProp has changed:', calendarData);
+  }, [calendarData]);
   
-
-
-
-
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

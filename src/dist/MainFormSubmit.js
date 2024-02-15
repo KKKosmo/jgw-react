@@ -187,7 +187,7 @@ var MainFormSubmit = function (props) {
         });
     }); };
     var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
-        var link, response, jsonData_1, updatedCalendarData, error_2;
+        var link, response, jsonData_1, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -209,16 +209,23 @@ var MainFormSubmit = function (props) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     jsonData_1 = _a.sent();
-                    updatedCalendarData = calendarData.map(function (item, index) {
-                        var dayNumber = jsonData_1.dayNumber[index] || '';
-                        var data = jsonData_1.data[index] || '';
-                        return {
-                            dayNumber: dayNumber,
-                            data: data,
-                            availability: item.availability,
-                        };
+                    setCalendarData(function (prevCalendarData) {
+                        var updatedData = prevCalendarData.map(function (item, index) {
+                            var dayNumber = jsonData_1.dayNumber[index] || '';
+                            var data = jsonData_1.data[index] || '';
+                            var blockData = data.split(',').map(function (item) { return item.trim(); });
+                            var isBlockDataValid = true;
+                            for (var _i = 0, selectedRooms_1 = selectedRooms; _i < selectedRooms_1.length; _i++) {
+                                var element = selectedRooms_1[_i];
+                                if (!blockData.includes(element)) {
+                                    isBlockDataValid = false;
+                                    break;
+                                }
+                            }
+                            return __assign(__assign({}, item), { dayNumber: dayNumber, data: data, availability: isBlockDataValid });
+                        });
+                        return updatedData;
                     });
-                    setCalendarData(updatedCalendarData);
                     return [3 /*break*/, 4];
                 case 3:
                     error_2 = _a.sent();
@@ -259,27 +266,27 @@ var MainFormSubmit = function (props) {
         }
     }, [formData.checkOut]);
     (0, react_1.useEffect)(function () {
-        var response = [];
         if (formData.checkIn && formData.checkOut) {
             setCalendarData(function (prevCalendarData) {
-                var updatedData = prevCalendarData.map(function (item, index) {
+                var updatedData = prevCalendarData.map(function (item) {
                     var blockData = item.data.split(',').map(function (item) { return item.trim(); });
                     var isBlockDataValid = true;
-                    for (var _i = 0, selectedRooms_1 = selectedRooms; _i < selectedRooms_1.length; _i++) {
-                        var element = selectedRooms_1[_i];
+                    for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
+                        var element = selectedRooms_2[_i];
                         if (!blockData.includes(element)) {
                             isBlockDataValid = false;
-                            break; // This breaks out of the inner loop
+                            break;
                         }
                     }
-                    response.push(isBlockDataValid);
                     return __assign(__assign({}, item), { availability: isBlockDataValid });
                 });
-                console.log("color");
                 return updatedData;
             });
         }
-    }, [selectedRooms, formData.checkIn, formData.checkOut]);
+    }, [selectedRooms]);
+    (0, react_1.useEffect)(function () {
+        console.log('yourProp has changed:', calendarData);
+    }, [calendarData]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {

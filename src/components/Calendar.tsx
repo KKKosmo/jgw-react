@@ -21,6 +21,9 @@ const Calendar: React.FC<CalendarProps> = ({ calendarData, calendarMonth}) => {
   // Chunk the calendarData array into rows of 7 columns
   const calendarRows = chunkArray(calendarData, 7);
 
+
+
+  
   return (
     <div className="container">
       <h1 id='calendarMonth'>
