@@ -61,12 +61,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
+var react_bootstrap_1 = require("react-bootstrap");
 var Home = function (_a) {
     var user = _a.user;
     var _b = (0, react_1.useState)([]), data = _b[0], setData = _b[1];
     var _c = (0, react_1.useState)('id'), sortColumn = _c[0], setSortColumn = _c[1];
     var _d = (0, react_1.useState)('asc'), sortOrder = _d[0], setSortOrder = _d[1];
     var navigate = (0, react_router_dom_1.useNavigate)();
+    var _e = (0, react_1.useState)(null), selectedItem = _e[0], setSelectedItem = _e[1]; // Track selected item for modal
+    var _f = (0, react_1.useState)(false), showModal = _f[0], setShowModal = _f[1];
+    var handleExpand = function (item) {
+        setSelectedItem(item);
+        setShowModal(true);
+    };
+    var closeModal = function () {
+        setShowModal(false);
+    };
     var defaultOrders = {
         id: 'asc',
         dateInserted: 'desc', // Set to 'desc' for dateInserted
@@ -180,31 +190,88 @@ var Home = function (_a) {
             react_1.default.createElement("th", { onClick: function () { return handleSort('user'); } }, "User")));
     };
     var renderRows = function () {
-        return data.map(function (item) { return (react_1.default.createElement("tr", { key: item.id },
-            react_1.default.createElement("td", null, item.id),
-            react_1.default.createElement("td", null, item.dateInserted),
-            react_1.default.createElement("td", null, item.name),
-            react_1.default.createElement("td", null, item.pax),
-            react_1.default.createElement("td", null, item.vehicle),
-            react_1.default.createElement("td", null, item.pets ? 'Yes' : 'No'),
-            react_1.default.createElement("td", null, item.videoke ? 'Yes' : 'No'),
-            react_1.default.createElement("td", null, item.partial_payment),
-            react_1.default.createElement("td", null, item.full_payment),
-            react_1.default.createElement("td", null, item.balance),
-            react_1.default.createElement("td", null, item.paid ? 'Yes' : 'No'),
-            react_1.default.createElement("td", null, item.checkIn),
-            react_1.default.createElement("td", null, item.checkOut),
-            react_1.default.createElement("td", null, item.room),
-            react_1.default.createElement("td", null, item.user),
-            react_1.default.createElement("td", null,
-                react_1.default.createElement("button", { onClick: function () { return handleEdit(item.id); } }, "Edit"),
-                react_1.default.createElement("button", { onClick: function () { return handleDelete(item.id); } }, "Delete")))); });
+        return data.map(function (item, index) { return (react_1.default.createElement("tr", { key: item.id, onClick: function () { return handleExpand(item); }, style: { backgroundColor: index % 2 === 0 ? '#f5f5f5' : 'white' } },
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.id),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.dateInserted),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.name),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pax),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.vehicle),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pets ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.videoke ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.partial_payment),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.full_payment),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.balance),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.paid ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkIn),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkOut),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.room),
+            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.user))); });
     };
     return (react_1.default.createElement("div", null,
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
-        react_1.default.createElement("table", null,
+        react_1.default.createElement(react_bootstrap_1.Table, { responsive: true },
             react_1.default.createElement("thead", null, renderHeader()),
-            react_1.default.createElement("tbody", null, renderRows()))));
+            react_1.default.createElement("tbody", null, renderRows())),
+        react_1.default.createElement(react_bootstrap_1.Modal, { show: showModal, onHide: closeModal },
+            react_1.default.createElement(react_bootstrap_1.Modal.Header, { closeButton: true },
+                react_1.default.createElement(react_bootstrap_1.Modal.Title, null, "Details")),
+            react_1.default.createElement(react_bootstrap_1.Modal.Body, null, selectedItem && (react_1.default.createElement(react_1.default.Fragment, null,
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Name:"),
+                    " ",
+                    selectedItem.name),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Pax:"),
+                    " ",
+                    selectedItem.pax),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Vehicle:"),
+                    " ",
+                    selectedItem.vehicle),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Pets:"),
+                    " ",
+                    selectedItem.pets ? 'Yes' : 'No'),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Videoke:"),
+                    " ",
+                    selectedItem.videoke ? 'Yes' : 'No'),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Partial Payment:"),
+                    " ",
+                    selectedItem.partial_payment),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Full Payment:"),
+                    " ",
+                    selectedItem.full_payment),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Balance:"),
+                    " ",
+                    selectedItem.balance),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Fully Paid:"),
+                    " ",
+                    selectedItem.paid ? 'Yes' : 'No'),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Check In:"),
+                    " ",
+                    selectedItem.checkIn),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Check Out:"),
+                    " ",
+                    selectedItem.checkOut),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Room:"),
+                    " ",
+                    selectedItem.room),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "User:"),
+                    " ",
+                    selectedItem.user)))),
+            react_1.default.createElement(react_bootstrap_1.Modal.Footer, null,
+                react_1.default.createElement(react_bootstrap_1.Button, { variant: "primary", onClick: function () { var _a; return handleEdit((_a = selectedItem === null || selectedItem === void 0 ? void 0 : selectedItem.id) !== null && _a !== void 0 ? _a : 0); } }, "Edit"),
+                react_1.default.createElement(react_bootstrap_1.Button, { variant: "danger", onClick: function () { var _a; return handleDelete((_a = selectedItem === null || selectedItem === void 0 ? void 0 : selectedItem.id) !== null && _a !== void 0 ? _a : 0); } }, "Delete"),
+                react_1.default.createElement(react_bootstrap_1.Button, { variant: "secondary", onClick: closeModal }, "Close")))));
 };
 exports.default = Home;
