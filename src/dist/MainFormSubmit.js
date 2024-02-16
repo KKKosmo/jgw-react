@@ -117,6 +117,11 @@ var MainFormSubmit = function (props) {
     var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
     var currentDate = new Date();
     var _d = (0, react_1.useState)("".concat(monthNames[currentDate.getMonth()])), calendarMonth = _d[0], setCalendarMonth = _d[1];
+    (0, react_1.useEffect)(function () {
+        getNewSet(currentDate.toDateString(), currentDate.toDateString());
+        return function () {
+        };
+    }, []);
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -240,13 +245,13 @@ var MainFormSubmit = function (props) {
             var checkInDate = new Date(formData.checkIn);
             console.log(checkInDate.getMonth());
             if (calendarMonth !== monthNames[checkInDate.getMonth()]) {
-                var checkOutDate = new Date(formData.checkOut);
-                if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                    getNewSet(formData.checkIn, formData.checkOut);
-                }
-                else {
-                    getNewSet(formData.checkIn, formData.checkIn);
-                }
+                // const checkOutDate = new Date(formData.checkOut);
+                // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                //   getNewSet(formData.checkIn, formData.checkOut);
+                // }
+                // else {
+                getNewSet(formData.checkIn, formData.checkIn);
+                // }
                 var dateObject = new Date(formData.checkIn);
                 var monthIndex = dateObject.getMonth();
                 setCalendarMonth(monthNames[monthIndex]);
@@ -257,13 +262,13 @@ var MainFormSubmit = function (props) {
         if (formData.checkIn && formData.checkOut) {
             var checkOutDate = new Date(formData.checkOut);
             if (calendarMonth !== monthNames[checkOutDate.getMonth()]) {
-                var checkInDate = new Date(formData.checkIn);
-                if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                    getNewSet(formData.checkIn, formData.checkOut);
-                }
-                else {
-                    getNewSet(formData.checkOut, formData.checkOut);
-                }
+                // const checkInDate = new Date(formData.checkIn);
+                // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                //   getNewSet(formData.checkIn, formData.checkOut);
+                // }
+                // else {
+                getNewSet(formData.checkOut, formData.checkOut);
+                // }
                 var dateObject = new Date(formData.checkOut);
                 var monthIndex = dateObject.getMonth();
                 setCalendarMonth(monthNames[monthIndex]);
