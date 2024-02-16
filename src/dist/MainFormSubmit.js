@@ -238,31 +238,36 @@ var MainFormSubmit = function (props) {
     (0, react_1.useEffect)(function () {
         if (formData.checkIn && formData.checkOut) {
             var checkInDate = new Date(formData.checkIn);
-            var checkOutDate = new Date(formData.checkOut);
-            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                getNewSet(formData.checkIn, formData.checkOut);
+            console.log(checkInDate.getMonth());
+            if (calendarMonth !== monthNames[checkInDate.getMonth()]) {
+                var checkOutDate = new Date(formData.checkOut);
+                if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                    getNewSet(formData.checkIn, formData.checkOut);
+                }
+                else {
+                    getNewSet(formData.checkIn, formData.checkIn);
+                }
+                var dateObject = new Date(formData.checkIn);
+                var monthIndex = dateObject.getMonth();
+                setCalendarMonth(monthNames[monthIndex]);
             }
-            else {
-                getNewSet(formData.checkIn, formData.checkIn);
-            }
-            var dateObject = new Date(formData.checkIn);
-            var monthIndex = dateObject.getMonth();
-            setCalendarMonth(monthNames[monthIndex]);
         }
     }, [formData.checkIn]);
     (0, react_1.useEffect)(function () {
         if (formData.checkIn && formData.checkOut) {
-            var checkInDate = new Date(formData.checkIn);
             var checkOutDate = new Date(formData.checkOut);
-            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                getNewSet(formData.checkIn, formData.checkOut);
+            if (calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+                var checkInDate = new Date(formData.checkIn);
+                if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                    getNewSet(formData.checkIn, formData.checkOut);
+                }
+                else {
+                    getNewSet(formData.checkOut, formData.checkOut);
+                }
+                var dateObject = new Date(formData.checkOut);
+                var monthIndex = dateObject.getMonth();
+                setCalendarMonth(monthNames[monthIndex]);
             }
-            else {
-                getNewSet(formData.checkOut, formData.checkOut);
-            }
-            var dateObject = new Date(formData.checkOut);
-            var monthIndex = dateObject.getMonth();
-            setCalendarMonth(monthNames[monthIndex]);
         }
     }, [formData.checkOut]);
     (0, react_1.useEffect)(function () {
@@ -284,9 +289,6 @@ var MainFormSubmit = function (props) {
             });
         }
     }, [selectedRooms]);
-    (0, react_1.useEffect)(function () {
-        console.log('yourProp has changed:', calendarData);
-    }, [calendarData]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {

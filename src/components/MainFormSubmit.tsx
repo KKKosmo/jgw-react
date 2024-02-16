@@ -183,40 +183,49 @@ const MainFormSubmit = (props: { user: string }) => {
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
       const checkInDate = new Date(formData.checkIn);
-      const checkOutDate = new Date(formData.checkOut);
+      console.log(checkInDate.getMonth());
+      if(calendarMonth !== monthNames[checkInDate.getMonth()]){
 
-      if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-        getNewSet(formData.checkIn, formData.checkOut);
+        const checkOutDate = new Date(formData.checkOut);
+
+        if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+          getNewSet(formData.checkIn, formData.checkOut);
+        }
+        else {
+          getNewSet(formData.checkIn, formData.checkIn);
+        }
+  
+        const dateObject = new Date(formData.checkIn);
+        const monthIndex = dateObject.getMonth();
+  
+        setCalendarMonth(monthNames[monthIndex]);
       }
-      else {
-        getNewSet(formData.checkIn, formData.checkIn);
-      }
 
-      const dateObject = new Date(formData.checkIn);
-      const monthIndex = dateObject.getMonth();
-
-      setCalendarMonth(monthNames[monthIndex]);
+      
     }
   }, [formData.checkIn]);
 
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
-      const checkInDate = new Date(formData.checkIn);
       const checkOutDate = new Date(formData.checkOut);
 
-      if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-        getNewSet(formData.checkIn, formData.checkOut);
+      if(calendarMonth !== monthNames[checkOutDate.getMonth()]){
+        const checkInDate = new Date(formData.checkIn);
+  
+        if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+          getNewSet(formData.checkIn, formData.checkOut);
+        }
+        else {
+          getNewSet(formData.checkOut, formData.checkOut);
+        }
+  
+        const dateObject = new Date(formData.checkOut);
+        const monthIndex = dateObject.getMonth();
+  
+        setCalendarMonth(monthNames[monthIndex]);
       }
-      else {
-        getNewSet(formData.checkOut, formData.checkOut);
-      }
 
 
-
-      const dateObject = new Date(formData.checkOut);
-      const monthIndex = dateObject.getMonth();
-
-      setCalendarMonth(monthNames[monthIndex]);
     }
   }, [formData.checkOut]);
 
@@ -245,10 +254,6 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   }, [selectedRooms]);
 
-  useEffect(() => {
-    console.log('yourProp has changed:', calendarData);
-  }, [calendarData]);
-  
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
