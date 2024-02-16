@@ -117,6 +117,11 @@ var MainFormSubmit = function (props) {
     var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
     var currentDate = new Date();
     var _d = (0, react_1.useState)("".concat(monthNames[currentDate.getMonth()])), calendarMonth = _d[0], setCalendarMonth = _d[1];
+    (0, react_1.useEffect)(function () {
+        getNewSet(currentDate.toDateString(), currentDate.toDateString());
+        return function () {
+        };
+    }, []);
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -238,55 +243,57 @@ var MainFormSubmit = function (props) {
     (0, react_1.useEffect)(function () {
         if (formData.checkIn && formData.checkOut) {
             var checkInDate = new Date(formData.checkIn);
-            var checkOutDate = new Date(formData.checkOut);
-            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                getNewSet(formData.checkIn, formData.checkOut);
-            }
-            else {
+            console.log(checkInDate.getMonth());
+            if (calendarMonth !== monthNames[checkInDate.getMonth()]) {
+                // const checkOutDate = new Date(formData.checkOut);
+                // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                //   getNewSet(formData.checkIn, formData.checkOut);
+                // }
+                // else {
                 getNewSet(formData.checkIn, formData.checkIn);
+                // }
+                var dateObject = new Date(formData.checkIn);
+                var monthIndex = dateObject.getMonth();
+                setCalendarMonth(monthNames[monthIndex]);
             }
-            var dateObject = new Date(formData.checkIn);
-            var monthIndex = dateObject.getMonth();
-            setCalendarMonth(monthNames[monthIndex]);
         }
     }, [formData.checkIn]);
     (0, react_1.useEffect)(function () {
         if (formData.checkIn && formData.checkOut) {
-            var checkInDate = new Date(formData.checkIn);
             var checkOutDate = new Date(formData.checkOut);
-            if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-                getNewSet(formData.checkIn, formData.checkOut);
-            }
-            else {
+            if (calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+                // const checkInDate = new Date(formData.checkIn);
+                // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
+                //   getNewSet(formData.checkIn, formData.checkOut);
+                // }
+                // else {
                 getNewSet(formData.checkOut, formData.checkOut);
+                // }
+                var dateObject = new Date(formData.checkOut);
+                var monthIndex = dateObject.getMonth();
+                setCalendarMonth(monthNames[monthIndex]);
             }
-            var dateObject = new Date(formData.checkOut);
-            var monthIndex = dateObject.getMonth();
-            setCalendarMonth(monthNames[monthIndex]);
         }
     }, [formData.checkOut]);
     (0, react_1.useEffect)(function () {
-        if (formData.checkIn && formData.checkOut) {
-            setCalendarData(function (prevCalendarData) {
-                var updatedData = prevCalendarData.map(function (item) {
-                    var blockData = item.data.split(',').map(function (item) { return item.trim(); });
-                    var isBlockDataValid = true;
-                    for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
-                        var element = selectedRooms_2[_i];
-                        if (!blockData.includes(element)) {
-                            isBlockDataValid = false;
-                            break;
-                        }
+        // if (formData.checkIn && formData.checkOut) {
+        setCalendarData(function (prevCalendarData) {
+            var updatedData = prevCalendarData.map(function (item) {
+                var blockData = item.data.split(',').map(function (item) { return item.trim(); });
+                var isBlockDataValid = true;
+                for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
+                    var element = selectedRooms_2[_i];
+                    if (!blockData.includes(element)) {
+                        isBlockDataValid = false;
+                        break;
                     }
-                    return __assign(__assign({}, item), { availability: isBlockDataValid });
-                });
-                return updatedData;
+                }
+                return __assign(__assign({}, item), { availability: isBlockDataValid });
             });
-        }
+            return updatedData;
+        });
+        // }
     }, [selectedRooms]);
-    (0, react_1.useEffect)(function () {
-        console.log('yourProp has changed:', calendarData);
-    }, [calendarData]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Table, Button, Modal } from 'react-bootstrap';
 
 interface MainItem {
   id: number;
@@ -28,6 +29,17 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const [sortColumn, setSortColumn] = useState<string | null>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState<MainItem | null>(null); // Track selected item for modal
+  const [showModal, setShowModal] = useState(false);
+
+  const handleExpand = (item: MainItem) => {
+    setSelectedItem(item);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   const defaultOrders: Record<string, 'asc' | 'desc'> = {
     id: 'asc',
@@ -97,20 +109,20 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       console.error('Error deleting record:', error);
     }
   };
-  
+
   const handleSort = (column: string) => {
-    if(column != sortColumn){
-        setSortOrder(defaultOrders[column]);
+    if (column != sortColumn) {
+      setSortOrder(defaultOrders[column]);
     }
-    else{
-        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    else {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     }
     setSortColumn(column);
   };
 
 
 
-  
+
   const renderHeader = () => {
     return (
       <tr>
@@ -132,42 +144,73 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       </tr>
     );
   };
-
   const renderRows = () => {
-    return data.map((item) => (
-      <tr key={item.id}>
-        
-        <td>{item.id}</td>
-              <td>{item.dateInserted}</td>
-              <td>{item.name}</td>
-              <td>{item.pax}</td>
-              <td>{item.vehicle}</td>
-              <td>{item.pets ? 'Yes' : 'No'}</td>
-              <td>{item.videoke ? 'Yes' : 'No'}</td>
-              <td>{item.partial_payment}</td>
-              <td>{item.full_payment}</td>
-              <td>{item.balance}</td>
-              <td>{item.paid ? 'Yes' : 'No'}</td>
-              <td>{item.checkIn}</td>
-              <td>{item.checkOut}</td>
-              <td>{item.room}</td>
-              <td>{item.user}</td>
-        <td>
-          <button onClick={() => handleEdit(item.id)}>Edit</button>
-          <button onClick={() => handleDelete(item.id)}>Delete</button>
-        </td>
+    return data.map((item, index) => (
+      <tr key={item.id} onClick={() => handleExpand(item)} style={{ backgroundColor: index % 2 === 0 ? '#f5f5f5' : 'white' }}>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.id}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.dateInserted}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.name}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.pax}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.vehicle}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.pets ? 'Yes' : 'No'}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.videoke ? 'Yes' : 'No'}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.partial_payment}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.full_payment}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.balance}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.paid ? 'Yes' : 'No'}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.checkIn}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.checkOut}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.room}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.user}</td>
       </tr>
     ));
   };
+  
+  
 
   return (
     <div>
       {user ? 'Hi ' + user : 'You are not logged in'}
       <h1>Main List</h1>
-      <table>
+      <Table responsive>
         <thead>{renderHeader()}</thead>
         <tbody>{renderRows()}</tbody>
-      </table>
+      </Table>
+
+      {/* Modal for expanded view */}
+      <Modal show={showModal} onHide={closeModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Render details of the selected item here */}
+          {selectedItem && (
+            <>
+              <p><strong>Name:</strong> {selectedItem.name}</p>
+              <p><strong>Pax:</strong> {selectedItem.pax}</p>
+              <p><strong>Vehicle:</strong> {selectedItem.vehicle}</p>
+              <p><strong>Pets:</strong> {selectedItem.pets ? 'Yes' : 'No'}</p>
+              <p><strong>Videoke:</strong> {selectedItem.videoke ? 'Yes' : 'No'}</p>
+              <p><strong>Partial Payment:</strong> {selectedItem.partial_payment}</p>
+              <p><strong>Full Payment:</strong> {selectedItem.full_payment}</p>
+              <p><strong>Balance:</strong> {selectedItem.balance}</p>
+              <p><strong>Fully Paid:</strong> {selectedItem.paid ? 'Yes' : 'No'}</p>
+              <p><strong>Check In:</strong> {selectedItem.checkIn}</p>
+              <p><strong>Check Out:</strong> {selectedItem.checkOut}</p>
+              <p><strong>Room:</strong> {selectedItem.room}</p>
+              <p><strong>User:</strong> {selectedItem.user}</p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => handleEdit(selectedItem?.id ?? 0)}>Edit</Button>
+          <Button variant="danger" onClick={() => handleDelete(selectedItem?.id ?? 0)}>Delete</Button>
+
+          <Button variant="secondary" onClick={closeModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

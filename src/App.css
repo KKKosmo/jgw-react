@@ -88,6 +88,8 @@
   text-align: right;
   margin-top: 5px; /* Adjust the top margin to your liking */
   margin-right: 5px; /* Adjust the right margin to your liking */
+  font-weight: bold;
+
 }
 
 .calendar-cell {
