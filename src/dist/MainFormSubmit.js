@@ -276,23 +276,23 @@ var MainFormSubmit = function (props) {
         }
     }, [formData.checkOut]);
     (0, react_1.useEffect)(function () {
-        if (formData.checkIn && formData.checkOut) {
-            setCalendarData(function (prevCalendarData) {
-                var updatedData = prevCalendarData.map(function (item) {
-                    var blockData = item.data.split(',').map(function (item) { return item.trim(); });
-                    var isBlockDataValid = true;
-                    for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
-                        var element = selectedRooms_2[_i];
-                        if (!blockData.includes(element)) {
-                            isBlockDataValid = false;
-                            break;
-                        }
+        // if (formData.checkIn && formData.checkOut) {
+        setCalendarData(function (prevCalendarData) {
+            var updatedData = prevCalendarData.map(function (item) {
+                var blockData = item.data.split(',').map(function (item) { return item.trim(); });
+                var isBlockDataValid = true;
+                for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
+                    var element = selectedRooms_2[_i];
+                    if (!blockData.includes(element)) {
+                        isBlockDataValid = false;
+                        break;
                     }
-                    return __assign(__assign({}, item), { availability: isBlockDataValid });
-                });
-                return updatedData;
+                }
+                return __assign(__assign({}, item), { availability: isBlockDataValid });
             });
-        }
+            return updatedData;
+        });
+        // }
     }, [selectedRooms]);
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;

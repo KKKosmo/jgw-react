@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,13 +58,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var react_1 = __importDefault(require("react"));
+var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
 var Nav = function (props) {
+    var _a = (0, react_1.useState)(true), isNavCollapsed = _a[0], setIsNavCollapsed = _a[1];
+    var handleNavCollapse = function () { return setIsNavCollapsed(!isNavCollapsed); };
     var logout = function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -53,6 +75,7 @@ var Nav = function (props) {
                 case 1:
                     _a.sent();
                     props.setUser('');
+                    handleNavCollapse(); // Close the menu after logout
                     return [2 /*return*/];
             }
         });
@@ -61,20 +84,23 @@ var Nav = function (props) {
     if (props.name === '') {
         menu = (react_1.default.createElement("ul", { className: "navbar-nav me-auto mb-2 mb-md-0" },
             react_1.default.createElement("li", { className: "nav-item active" },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link" }, "Login"),
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: handleNavCollapse }, "Login"),
                 react_1.default.createElement("h1", { className: 'navText' }, "Please log in first"))));
     }
     else {
-        menu = (react_1.default.createElement("ul", { className: "navbar-nav me-auto mb-2 mb-md-0" },
+        menu = (react_1.default.createElement("ul", { className: "navbar-nav mb-2 mb-md-0" },
             react_1.default.createElement("li", { className: 'nav-item active' },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/", className: "navbar-brand" }, "Home")),
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/", className: "navbar-brand", onClick: handleNavCollapse }, "Home")),
             react_1.default.createElement("li", { className: "nav-item active" },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: logout }, "Logout")),
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: function () { logout(); } }, "Logout")),
             react_1.default.createElement("li", { className: "nav-item active" },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/MainFormSubmit", className: "nav-link" }, "New Book"))));
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/MainFormSubmit", className: "nav-link", onClick: handleNavCollapse }, "New Book"))));
     }
     return (react_1.default.createElement("nav", { className: "navbar navbar-expand-md navbar-dark bg-dark mb-4" },
         react_1.default.createElement("div", { className: "container-fluid" },
-            react_1.default.createElement("div", null, menu))));
+            react_1.default.createElement(react_router_dom_1.Link, { to: "/", className: "navbar-brand", onClick: handleNavCollapse }, "Your Brand Name"),
+            react_1.default.createElement("button", { className: "navbar-toggler", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#navbarNav", "aria-controls": "navbarNav", "aria-expanded": !isNavCollapsed ? true : false, "aria-label": "Toggle navigation", onClick: handleNavCollapse },
+                react_1.default.createElement("span", { className: "navbar-toggler-icon" })),
+            react_1.default.createElement("div", { className: "collapse navbar-collapse ".concat(!isNavCollapsed ? 'show' : ''), id: "navbarNav" }, menu))));
 };
 exports.default = Nav;

@@ -232,7 +232,7 @@ const MainFormSubmit = (props: { user: string }) => {
 
 
   useEffect(() => {
-    if (formData.checkIn && formData.checkOut) {
+    // if (formData.checkIn && formData.checkOut) {
       setCalendarData(prevCalendarData => {
         const updatedData = prevCalendarData.map(item => {
           const blockData = item.data.split(',').map(item => item.trim());
@@ -252,7 +252,7 @@ const MainFormSubmit = (props: { user: string }) => {
         });
         return updatedData;
       });
-    }
+    // }
   }, [selectedRooms]);
 
 
