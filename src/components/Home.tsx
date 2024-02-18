@@ -38,6 +38,89 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0); // State for total items
   const [totalPages, setTotalPages] = useState(0); // State for total pages
+  const [nameFilter, setNameFilter] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(event.target.value);
+  };
+  
+
+
+
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const selectedValue = event.target.value;
+
+  // Extract month and year separately
+  const [numericMonth, year] = selectedValue.split(' ');
+
+  // Convert numeric month to month name
+  const monthName = new Date(`${year}-${numericMonth}-01`).toLocaleDateString('en-US', {
+    month: 'short', // Use 'short' for abbreviated month name (MMM)
+  });
+
+  console.log('Selected Month:', monthName);
+  console.log('Selected Year:', year);
+
+  // Automatically set start and end dates based on the selected month
+  const selectedStartDate = new Date(`${year}-${numericMonth}-01`).toISOString().split('T')[0];
+  const lastDayOfMonth = new Date(parseInt(year), parseInt(numericMonth, 10), 0).getDate();
+  const selectedEndDate = new Date(`${year}-${numericMonth}-${lastDayOfMonth}`).toISOString().split('T')[0];
+
+  // Update the state with the selected month
+  setSelectedMonth(`${numericMonth} ${year}`);
+
+  // Update the start and end dates
+  setStartDate(selectedStartDate);
+  setEndDate(selectedEndDate);
+
+  // Other logic...
+};
+
+
+
+
+
+
+  const generateMonthOptions = () => {
+    const options = [];
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+  
+    const startYear = 2023;
+    const startMonth = 12;
+  
+    // Calculate the difference in months between the current date and December 2023
+    const monthsDifference = (currentYear - startYear) * 12 + currentMonth - startMonth + 1;
+  
+    for (let i = 0; i < monthsDifference + 3; i++) {
+      const monthValue = (startMonth + i) % 12 || 12; // Ensure values are between 1 and 12
+      const year = startYear + Math.floor((startMonth + i - 1) / 12);
+  
+      const optionValue = `${monthValue} ${year}`;
+  
+      options.push(
+        <option key={`${year}-${monthValue}`} value={optionValue}>
+          {new Date(year, monthValue - 1, 1).toLocaleDateString('en-US', {
+            month: 'short', // Use 'short' for abbreviated month name (MMM)
+            year: 'numeric',
+          })}
+        </option>
+      );
+    }
+  
+    return options;
+  };
+  
+  
+
 
   const handleExpand = (item: MainItem) => {
     setSelectedItem(item);
@@ -70,36 +153,33 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   }, [sortColumn, sortOrder, currentPage]);
 
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}&name=${nameFilter}&startDate=${startDate}&endDate=${endDate}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'include',
+        }
+      );
 
-const fetchData = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'include',
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const result = await response.json();
+
+      setData(result.data || []);
+      setTotalItems(result.total || 0);
+      setTotalPages(Math.ceil(result.total / ITEMS_PER_PAGE));
+    } catch (error: any) {
+      console.error('Error fetching data:', error.message);
     }
+  };
 
-    const result = await response.json();
-    console.log('Received data:', result);
-
-    setData(result.data || []);
-
-    setTotalItems(Number(result.total));
-    setTotalPages(result.total_pages);
-    
-  } catch (error: any) {
-    console.error('Error fetching data:', error.message);
-  }
-};
 
   
   const handleEdit = (id: number) => {
@@ -117,7 +197,6 @@ const fetchData = async () => {
       });
 
       const data = await response.json();
-      console.log('Response:', data);
 
       // Reload data after deletion
       fetchData();
@@ -141,7 +220,14 @@ const fetchData = async () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNameFilter(event.target.value);
+  };
 
+  const handleFilter = () => {
+    // Trigger fetching data with the updated name filter
+    fetchData();
+  };
   const renderSortIcon = (column: string) => {
     if (column === sortColumn) {
       return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
@@ -236,6 +322,77 @@ const fetchData = async () => {
     <div>
       {user ? 'Hi ' + user : 'You are not logged in'}
       <h1>Main List</h1>
+
+
+
+
+
+
+
+
+      {/* Add the filter box */}
+      <div className="filter-box">
+        <h2>Filter Check-in Date</h2>
+        <div className="filter-container">
+          <label htmlFor="nameFilter">Name:</label>
+          <input
+            type="text"
+            id="nameFilter"
+            value={nameFilter}
+            onChange={handleNameChange}
+          />
+
+          {/* Add the month selector dropdown */}
+          <label htmlFor="monthSelector">Select Month:</label>
+          <select
+            id="monthSelector"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+          >
+            <option value="" disabled>Select Month</option>
+            {generateMonthOptions()}
+          </select>
+
+          <label htmlFor="startDate">Start Date:</label>
+          <input
+            type="date"
+            id="startDate"
+            value={startDate}
+            onChange={handleStartDateChange}
+          />
+
+          <label htmlFor="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            value={endDate}
+            onChange={handleEndDateChange}
+          />
+
+          <button onClick={handleFilter}>Apply Filters</button>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <Table responsive bordered hover>
         <thead>{renderHeader()}</thead>
         <tbody>{renderRows()}</tbody>

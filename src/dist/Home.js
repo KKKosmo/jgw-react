@@ -76,6 +76,56 @@ var Home = function (_a) {
     var _g = (0, react_1.useState)(1), currentPage = _g[0], setCurrentPage = _g[1];
     var _h = (0, react_1.useState)(0), totalItems = _h[0], setTotalItems = _h[1]; // State for total items
     var _j = (0, react_1.useState)(0), totalPages = _j[0], setTotalPages = _j[1]; // State for total pages
+    var _k = (0, react_1.useState)(''), nameFilter = _k[0], setNameFilter = _k[1];
+    var _l = (0, react_1.useState)(''), selectedMonth = _l[0], setSelectedMonth = _l[1];
+    var _m = (0, react_1.useState)(''), startDate = _m[0], setStartDate = _m[1];
+    var _o = (0, react_1.useState)(''), endDate = _o[0], setEndDate = _o[1];
+    var handleStartDateChange = function (event) {
+        setStartDate(event.target.value);
+    };
+    var handleEndDateChange = function (event) {
+        setEndDate(event.target.value);
+    };
+    var handleMonthChange = function (event) {
+        var selectedValue = event.target.value;
+        // Extract month and year separately
+        var _a = selectedValue.split(' '), numericMonth = _a[0], year = _a[1];
+        // Convert numeric month to month name
+        var monthName = new Date("".concat(year, "-").concat(numericMonth, "-01")).toLocaleDateString('en-US', {
+            month: 'short', // Use 'short' for abbreviated month name (MMM)
+        });
+        console.log('Selected Month:', monthName);
+        console.log('Selected Year:', year);
+        // Automatically set start and end dates based on the selected month
+        var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01")).toISOString().split('T')[0];
+        var lastDayOfMonth = new Date(parseInt(year), parseInt(numericMonth, 10), 0).getDate();
+        var selectedEndDate = new Date("".concat(year, "-").concat(numericMonth, "-").concat(lastDayOfMonth)).toISOString().split('T')[0];
+        // Update the state with the selected month
+        setSelectedMonth("".concat(numericMonth, " ").concat(year));
+        // Update the start and end dates
+        setStartDate(selectedStartDate);
+        setEndDate(selectedEndDate);
+        // Other logic...
+    };
+    var generateMonthOptions = function () {
+        var options = [];
+        var currentYear = new Date().getFullYear();
+        var currentMonth = new Date().getMonth() + 1;
+        var startYear = 2023;
+        var startMonth = 12;
+        // Calculate the difference in months between the current date and December 2023
+        var monthsDifference = (currentYear - startYear) * 12 + currentMonth - startMonth + 1;
+        for (var i = 0; i < monthsDifference + 3; i++) {
+            var monthValue = (startMonth + i) % 12 || 12; // Ensure values are between 1 and 12
+            var year = startYear + Math.floor((startMonth + i - 1) / 12);
+            var optionValue = "".concat(monthValue, " ").concat(year);
+            options.push(react_1.default.createElement("option", { key: "".concat(year, "-").concat(monthValue), value: optionValue }, new Date(year, monthValue - 1, 1).toLocaleDateString('en-US', {
+                month: 'short', // Use 'short' for abbreviated month name (MMM)
+                year: 'numeric',
+            })));
+        }
+        return options;
+    };
     var handleExpand = function (item) {
         setSelectedItem(item);
         setShowModal(true);
@@ -109,7 +159,7 @@ var Home = function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder, "&page=").concat(currentPage, "&perPage=").concat(ITEMS_PER_PAGE), {
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder, "&page=").concat(currentPage, "&perPage=").concat(ITEMS_PER_PAGE, "&name=").concat(nameFilter, "&startDate=").concat(startDate, "&endDate=").concat(endDate), {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -124,10 +174,9 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     result = _a.sent();
-                    console.log('Received data:', result);
                     setData(result.data || []);
-                    setTotalItems(Number(result.total));
-                    setTotalPages(result.total_pages);
+                    setTotalItems(result.total || 0);
+                    setTotalPages(Math.ceil(result.total / ITEMS_PER_PAGE));
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
@@ -158,7 +207,6 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     data_1 = _a.sent();
-                    console.log('Response:', data_1);
                     // Reload data after deletion
                     fetchData();
                     return [3 /*break*/, 4];
@@ -181,6 +229,13 @@ var Home = function (_a) {
     };
     var handlePageChange = function (page) {
         setCurrentPage(page);
+    };
+    var handleNameChange = function (event) {
+        setNameFilter(event.target.value);
+    };
+    var handleFilter = function () {
+        // Trigger fetching data with the updated name filter
+        fetchData();
     };
     var renderSortIcon = function (column) {
         if (column === sortColumn) {
@@ -259,6 +314,20 @@ var Home = function (_a) {
     return (react_1.default.createElement("div", null,
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
+        react_1.default.createElement("div", { className: "filter-box" },
+            react_1.default.createElement("h2", null, "Filter Check-in Date"),
+            react_1.default.createElement("div", { className: "filter-container" },
+                react_1.default.createElement("label", { htmlFor: "nameFilter" }, "Name:"),
+                react_1.default.createElement("input", { type: "text", id: "nameFilter", value: nameFilter, onChange: handleNameChange }),
+                react_1.default.createElement("label", { htmlFor: "monthSelector" }, "Select Month:"),
+                react_1.default.createElement("select", { id: "monthSelector", value: selectedMonth, onChange: handleMonthChange },
+                    react_1.default.createElement("option", { value: "", disabled: true }, "Select Month"),
+                    generateMonthOptions()),
+                react_1.default.createElement("label", { htmlFor: "startDate" }, "Start Date:"),
+                react_1.default.createElement("input", { type: "date", id: "startDate", value: startDate, onChange: handleStartDateChange }),
+                react_1.default.createElement("label", { htmlFor: "endDate" }, "End Date:"),
+                react_1.default.createElement("input", { type: "date", id: "endDate", value: endDate, onChange: handleEndDateChange }),
+                react_1.default.createElement("button", { onClick: handleFilter }, "Apply Filters"))),
         react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, bordered: true, hover: true },
             react_1.default.createElement("thead", null, renderHeader()),
             react_1.default.createElement("tbody", null, renderRows())),
