@@ -62,14 +62,70 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
 var react_bootstrap_1 = require("react-bootstrap");
+var react_fontawesome_1 = require("@fortawesome/react-fontawesome");
+var free_solid_svg_icons_1 = require("@fortawesome/free-solid-svg-icons");
+var ITEMS_PER_PAGE = 10;
 var Home = function (_a) {
     var user = _a.user;
     var _b = (0, react_1.useState)([]), data = _b[0], setData = _b[1];
     var _c = (0, react_1.useState)('id'), sortColumn = _c[0], setSortColumn = _c[1];
     var _d = (0, react_1.useState)('asc'), sortOrder = _d[0], setSortOrder = _d[1];
     var navigate = (0, react_router_dom_1.useNavigate)();
-    var _e = (0, react_1.useState)(null), selectedItem = _e[0], setSelectedItem = _e[1]; // Track selected item for modal
+    var _e = (0, react_1.useState)(null), selectedItem = _e[0], setSelectedItem = _e[1];
     var _f = (0, react_1.useState)(false), showModal = _f[0], setShowModal = _f[1];
+    var _g = (0, react_1.useState)(1), currentPage = _g[0], setCurrentPage = _g[1];
+    var _h = (0, react_1.useState)(0), totalItems = _h[0], setTotalItems = _h[1]; // State for total items
+    var _j = (0, react_1.useState)(0), totalPages = _j[0], setTotalPages = _j[1]; // State for total pages
+    var _k = (0, react_1.useState)(''), nameFilter = _k[0], setNameFilter = _k[1];
+    var _l = (0, react_1.useState)(''), selectedMonth = _l[0], setSelectedMonth = _l[1];
+    var _m = (0, react_1.useState)(''), startDate = _m[0], setStartDate = _m[1];
+    var _o = (0, react_1.useState)(''), endDate = _o[0], setEndDate = _o[1];
+    var handleStartDateChange = function (event) {
+        setStartDate(event.target.value);
+    };
+    var handleEndDateChange = function (event) {
+        setEndDate(event.target.value);
+    };
+    var handleMonthChange = function (event) {
+        var selectedValue = event.target.value;
+        // Extract month and year separately
+        var _a = selectedValue.split(' '), numericMonth = _a[0], year = _a[1];
+        // Convert numeric month to month name
+        var monthName = new Date("".concat(year, "-").concat(numericMonth, "-01")).toLocaleDateString('en-US', {
+            month: 'short', // Use 'short' for abbreviated month name (MMM)
+        });
+        console.log('Selected Month:', monthName);
+        console.log('Selected Year:', year);
+        // Automatically set start and end dates based on the selected month
+        var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01")).toISOString().split('T')[0];
+        var lastDayOfMonth = new Date(parseInt(year), parseInt(numericMonth, 10), 0).getDate();
+        var selectedEndDate = new Date("".concat(year, "-").concat(numericMonth, "-").concat(lastDayOfMonth)).toISOString().split('T')[0];
+        // Update the state with the selected month
+        setSelectedMonth("".concat(numericMonth, " ").concat(year));
+        // Update the start and end dates
+        setStartDate(selectedStartDate);
+        setEndDate(selectedEndDate);
+        // Other logic...
+    };
+    var generateMonthOptions = function () {
+        var options = [];
+        var currentYear = new Date().getFullYear();
+        var currentMonth = new Date().getMonth() + 1;
+        var startYear = 2023;
+        var startMonth = 12;
+        // Calculate the difference in months between the current date and December 2023
+        var monthsDifference = (currentYear - startYear) * 12 + currentMonth - startMonth + 1;
+        for (var i = 0; i < monthsDifference + 3; i++) {
+            var monthValue = (startMonth + i) % 12 || 12; // Ensure values are between 1 and 12
+            var year = startYear + Math.floor((startMonth + i - 1) / 12);
+            var optionValue = "".concat(monthValue, " ").concat(year);
+            options.push(react_1.default.createElement("option", { key: "".concat(year, "-").concat(monthValue), value: optionValue }, new Date(year, monthValue - 1, 1).toLocaleDateString('en-US', {
+                month: 'short', // Use 'short' for abbreviated month name (MMM)
+                year: 'numeric',
+            })));
+        }
+        return options;
+    };
     var handleExpand = function (item) {
         setSelectedItem(item);
         setShowModal(true);
@@ -94,13 +150,16 @@ var Home = function (_a) {
         room: 'asc',
         user: 'asc',
     };
+    (0, react_1.useEffect)(function () {
+        fetchData();
+    }, [sortColumn, sortOrder, currentPage]);
     var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, result, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder), {
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder, "&page=").concat(currentPage, "&perPage=").concat(ITEMS_PER_PAGE, "&name=").concat(nameFilter, "&startDate=").concat(startDate, "&endDate=").concat(endDate), {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -115,7 +174,9 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     result = _a.sent();
-                    setData(result || []);
+                    setData(result.data || []);
+                    setTotalItems(result.total || 0);
+                    setTotalPages(Math.ceil(result.total / ITEMS_PER_PAGE));
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
@@ -125,10 +186,6 @@ var Home = function (_a) {
             }
         });
     }); };
-    (0, react_1.useEffect)(function () {
-        // Call fetchData when the component mounts or when sortColumn/sortOrder changes
-        fetchData();
-    }, [sortColumn, sortOrder]);
     var handleEdit = function (id) {
         navigate("/edit/".concat(id));
     };
@@ -150,7 +207,6 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     data_1 = _a.sent();
-                    console.log('Response:', data_1);
                     // Reload data after deletion
                     fetchData();
                     return [3 /*break*/, 4];
@@ -171,52 +227,132 @@ var Home = function (_a) {
         }
         setSortColumn(column);
     };
+    var handlePageChange = function (page) {
+        setCurrentPage(page);
+    };
+    var handleNameChange = function (event) {
+        setNameFilter(event.target.value);
+    };
+    var handleFilter = function () {
+        // Trigger fetching data with the updated name filter
+        fetchData();
+    };
+    var renderSortIcon = function (column) {
+        if (column === sortColumn) {
+            return sortOrder === 'asc' ? react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortUp }) : react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortDown });
+        }
+        else {
+            return react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSort });
+        }
+    };
     var renderHeader = function () {
         return (react_1.default.createElement("tr", null,
-            react_1.default.createElement("th", { onClick: function () { return handleSort('id'); } }, "ID"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('dateInserted'); } }, "Date Inserted"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('name'); } }, "Name"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('pax'); } }, "Pax"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('vehicle'); } }, "Vehicle"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('pets'); } }, "Pets"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); } }, "Videoke"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); } }, "Partial Payment"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); } }, "Full Payment"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('balance'); } }, "Balance"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); } }, "Fully Paid"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); } }, "Check In"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); } }, "Check Out"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('room'); } }, "Room"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('user'); } }, "User")));
+            react_1.default.createElement("th", { onClick: function () { return handleSort('id'); }, className: "header-cell" },
+                "ID ",
+                renderSortIcon('id')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('dateInserted'); }, className: "header-cell" },
+                "Date Inserted ",
+                renderSortIcon('dateInserted')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('name'); }, className: "header-cell" },
+                "Name ",
+                renderSortIcon('name')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('pax'); }, className: "header-cell" },
+                "Pax ",
+                renderSortIcon('pax')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('room'); }, className: "header-cell" },
+                "Room ",
+                renderSortIcon('room')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('vehicle'); }, className: "header-cell" },
+                "Vehicle ",
+                renderSortIcon('vehicle')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('pets'); }, className: "header-cell" },
+                "Pets ",
+                renderSortIcon('pets')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); }, className: "header-cell" },
+                "Videoke ",
+                renderSortIcon('videoke')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); }, className: "header-cell" },
+                "Partial Payment ",
+                renderSortIcon('partial_payment')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); }, className: "header-cell" },
+                "Full Payment ",
+                renderSortIcon('full_payment')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('balance'); }, className: "header-cell" },
+                "Balance ",
+                renderSortIcon('balance')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); }, className: "header-cell" },
+                "Fully Paid ",
+                renderSortIcon('paid')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); }, className: "header-cell" },
+                "Check In ",
+                renderSortIcon('checkIn')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); }, className: "header-cell" },
+                "Check Out ",
+                renderSortIcon('checkOut')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('user'); }, className: "header-cell" },
+                "User ",
+                renderSortIcon('user'))));
     };
     var renderRows = function () {
-        return data.map(function (item, index) { return (react_1.default.createElement("tr", { key: item.id, onClick: function () { return handleExpand(item); }, style: { backgroundColor: index % 2 === 0 ? '#f5f5f5' : 'white' } },
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.id),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.dateInserted),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.name),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pax),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.vehicle),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pets ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.videoke ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.partial_payment),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.full_payment),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.balance),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.paid ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkIn),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkOut),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.room),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.user))); });
+        return data.map(function (item, index) { return (react_1.default.createElement("tr", { key: item.id, onClick: function () { return handleExpand(item); }, className: "table-row ".concat(index % 2 === 0 ? 'even-row' : 'odd-row') },
+            react_1.default.createElement("td", { className: "table-cell" }, item.id),
+            react_1.default.createElement("td", { className: "table-cell" }, item.dateInserted),
+            react_1.default.createElement("td", { className: "table-cell" }, item.name),
+            react_1.default.createElement("td", { className: "table-cell" }, item.pax),
+            react_1.default.createElement("td", { className: "table-cell" }, item.room),
+            react_1.default.createElement("td", { className: "table-cell" }, item.vehicle),
+            react_1.default.createElement("td", { className: "table-cell" }, item.pets ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.videoke ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.partial_payment),
+            react_1.default.createElement("td", { className: "table-cell" }, item.full_payment),
+            react_1.default.createElement("td", { className: "table-cell" }, item.balance),
+            react_1.default.createElement("td", { className: "table-cell" }, item.paid ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.checkIn),
+            react_1.default.createElement("td", { className: "table-cell" }, item.checkOut),
+            react_1.default.createElement("td", { className: "table-cell" }, item.user))); });
     };
     return (react_1.default.createElement("div", null,
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
-        react_1.default.createElement(react_bootstrap_1.Table, { responsive: true },
+        react_1.default.createElement("div", { className: "filter-box" },
+            react_1.default.createElement("h2", null, "Filter Check-in Date"),
+            react_1.default.createElement("div", { className: "filter-container" },
+                react_1.default.createElement("label", { htmlFor: "nameFilter" }, "Name:"),
+                react_1.default.createElement("input", { type: "text", id: "nameFilter", value: nameFilter, onChange: handleNameChange }),
+                react_1.default.createElement("label", { htmlFor: "monthSelector" }, "Select Month:"),
+                react_1.default.createElement("select", { id: "monthSelector", value: selectedMonth, onChange: handleMonthChange },
+                    react_1.default.createElement("option", { value: "", disabled: true }, "Select Month"),
+                    generateMonthOptions()),
+                react_1.default.createElement("label", { htmlFor: "startDate" }, "Start Date:"),
+                react_1.default.createElement("input", { type: "date", id: "startDate", value: startDate, onChange: handleStartDateChange }),
+                react_1.default.createElement("label", { htmlFor: "endDate" }, "End Date:"),
+                react_1.default.createElement("input", { type: "date", id: "endDate", value: endDate, onChange: handleEndDateChange }),
+                react_1.default.createElement("button", { onClick: handleFilter }, "Apply Filters"))),
+        react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, bordered: true, hover: true },
             react_1.default.createElement("thead", null, renderHeader()),
             react_1.default.createElement("tbody", null, renderRows())),
+        react_1.default.createElement(react_bootstrap_1.Pagination, null,
+            Array.from({ length: totalPages }, function (_, index) { return (react_1.default.createElement(react_bootstrap_1.Pagination.Item, { key: index + 1, active: index + 1 === currentPage, onClick: function () { return handlePageChange(index + 1); } }, index + 1)); }),
+            react_1.default.createElement(react_bootstrap_1.Pagination.Prev, { onClick: function () { return handlePageChange(currentPage - 1); }, disabled: currentPage === 1 }),
+            react_1.default.createElement(react_bootstrap_1.Pagination.Next, { onClick: function () { return handlePageChange(currentPage + 1); }, disabled: currentPage === totalPages }),
+            react_1.default.createElement("div", { className: "pagination-info" },
+                react_1.default.createElement("span", null,
+                    "Page ",
+                    currentPage,
+                    " of ",
+                    totalPages))),
         react_1.default.createElement(react_bootstrap_1.Modal, { show: showModal, onHide: closeModal },
             react_1.default.createElement(react_bootstrap_1.Modal.Header, { closeButton: true },
                 react_1.default.createElement(react_bootstrap_1.Modal.Title, null, "Details")),
             react_1.default.createElement(react_bootstrap_1.Modal.Body, null, selectedItem && (react_1.default.createElement(react_1.default.Fragment, null,
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "ID:"),
+                    " ",
+                    selectedItem.id),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Date Inserted:"),
+                    " ",
+                    selectedItem.dateInserted),
                 react_1.default.createElement("p", null,
                     react_1.default.createElement("strong", null, "Name:"),
                     " ",
@@ -225,6 +361,10 @@ var Home = function (_a) {
                     react_1.default.createElement("strong", null, "Pax:"),
                     " ",
                     selectedItem.pax),
+                react_1.default.createElement("p", null,
+                    react_1.default.createElement("strong", null, "Room:"),
+                    " ",
+                    selectedItem.room),
                 react_1.default.createElement("p", null,
                     react_1.default.createElement("strong", null, "Vehicle:"),
                     " ",
@@ -261,10 +401,6 @@ var Home = function (_a) {
                     react_1.default.createElement("strong", null, "Check Out:"),
                     " ",
                     selectedItem.checkOut),
-                react_1.default.createElement("p", null,
-                    react_1.default.createElement("strong", null, "Room:"),
-                    " ",
-                    selectedItem.room),
                 react_1.default.createElement("p", null,
                     react_1.default.createElement("strong", null, "User:"),
                     " ",
