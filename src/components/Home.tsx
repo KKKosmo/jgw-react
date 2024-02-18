@@ -122,35 +122,42 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
-
   const renderHeader = () => {
     return (
       <tr>
-        <th onClick={() => handleSort('id')}>ID</th>
-        <th onClick={() => handleSort('dateInserted')}>Date Inserted</th>
-        <th onClick={() => handleSort('name')}>Name</th>
-        <th onClick={() => handleSort('pax')}>Pax</th>
-        <th onClick={() => handleSort('vehicle')}>Vehicle</th>
-        <th onClick={() => handleSort('pets')}>Pets</th>
-        <th onClick={() => handleSort('videoke')}>Videoke</th>
-        <th onClick={() => handleSort('partial_payment')}>Partial Payment</th>
-        <th onClick={() => handleSort('full_payment')}>Full Payment</th>
-        <th onClick={() => handleSort('balance')}>Balance</th>
-        <th onClick={() => handleSort('paid')}>Fully Paid</th>
-        <th onClick={() => handleSort('checkIn')}>Check In</th>
-        <th onClick={() => handleSort('checkOut')}>Check Out</th>
-        <th onClick={() => handleSort('room')}>Room</th>
-        <th onClick={() => handleSort('user')}>User</th>
+        <th onClick={() => handleSort('id')} className="header-cell">ID</th>
+        <th onClick={() => handleSort('dateInserted')} className="header-cell">Date Inserted</th>
+        <th onClick={() => handleSort('name')} className="header-cell">Name</th>
+        <th onClick={() => handleSort('pax')} className="header-cell">Pax</th>
+        <th onClick={() => handleSort('room')} className="header-cell">Room</th>
+        <th onClick={() => handleSort('vehicle')} className="header-cell">Vehicle</th>
+        <th onClick={() => handleSort('pets')} className="header-cell">Pets</th>
+        <th onClick={() => handleSort('videoke')} className="header-cell">Videoke</th>
+        <th onClick={() => handleSort('partial_payment')} className="header-cell">Partial Payment</th>
+        <th onClick={() => handleSort('full_payment')} className="header-cell">Full Payment</th>
+        <th onClick={() => handleSort('balance')} className="header-cell">Balance</th>
+        <th onClick={() => handleSort('paid')} className="header-cell">Fully Paid</th>
+        <th onClick={() => handleSort('checkIn')} className="header-cell">Check In</th>
+        <th onClick={() => handleSort('checkOut')} className="header-cell">Check Out</th>
+        <th onClick={() => handleSort('user')} className="header-cell">User</th>
       </tr>
     );
   };
+
+
+
   const renderRows = () => {
     return data.map((item, index) => (
-      <tr key={item.id} onClick={() => handleExpand(item)} style={{ backgroundColor: index % 2 === 0 ? '#f5f5f5' : 'white' }}>
+      <tr
+        key={item.id}
+        onClick={() => handleExpand(item)}
+        className={`table-row ${index % 2 === 0 ? 'even-row' : 'odd-row'}`}
+      >
         <td style={{ whiteSpace: 'nowrap' }}>{item.id}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.dateInserted}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.name}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.pax}</td>
+        <td style={{ whiteSpace: 'nowrap' }}>{item.room}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.vehicle}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.pets ? 'Yes' : 'No'}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.videoke ? 'Yes' : 'No'}</td>
@@ -160,19 +167,18 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         <td style={{ whiteSpace: 'nowrap' }}>{item.paid ? 'Yes' : 'No'}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.checkIn}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.checkOut}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.room}</td>
         <td style={{ whiteSpace: 'nowrap' }}>{item.user}</td>
       </tr>
     ));
   };
-  
-  
+
+
 
   return (
     <div>
       {user ? 'Hi ' + user : 'You are not logged in'}
       <h1>Main List</h1>
-      <Table responsive>
+      <Table responsive striped bordered hover>
         <thead>{renderHeader()}</thead>
         <tbody>{renderRows()}</tbody>
       </Table>
@@ -186,8 +192,11 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           {/* Render details of the selected item here */}
           {selectedItem && (
             <>
+              <p><strong>ID:</strong> {selectedItem.id}</p>
+              <p><strong>Date Inserted:</strong> {selectedItem.dateInserted}</p>
               <p><strong>Name:</strong> {selectedItem.name}</p>
               <p><strong>Pax:</strong> {selectedItem.pax}</p>
+              <p><strong>Room:</strong> {selectedItem.room}</p>
               <p><strong>Vehicle:</strong> {selectedItem.vehicle}</p>
               <p><strong>Pets:</strong> {selectedItem.pets ? 'Yes' : 'No'}</p>
               <p><strong>Videoke:</strong> {selectedItem.videoke ? 'Yes' : 'No'}</p>
@@ -197,7 +206,6 @@ const Home: React.FC<HomeProps> = ({ user }) => {
               <p><strong>Fully Paid:</strong> {selectedItem.paid ? 'Yes' : 'No'}</p>
               <p><strong>Check In:</strong> {selectedItem.checkIn}</p>
               <p><strong>Check Out:</strong> {selectedItem.checkOut}</p>
-              <p><strong>Room:</strong> {selectedItem.room}</p>
               <p><strong>User:</strong> {selectedItem.user}</p>
             </>
           )}
