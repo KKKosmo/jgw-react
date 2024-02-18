@@ -62,6 +62,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
 var react_bootstrap_1 = require("react-bootstrap");
+var react_fontawesome_1 = require("@fortawesome/react-fontawesome");
+var free_solid_svg_icons_1 = require("@fortawesome/free-solid-svg-icons");
 var Home = function (_a) {
     var user = _a.user;
     var _b = (0, react_1.useState)([]), data = _b[0], setData = _b[1];
@@ -171,46 +173,84 @@ var Home = function (_a) {
         }
         setSortColumn(column);
     };
+    var renderSortIcon = function (column) {
+        if (column === sortColumn) {
+            return sortOrder === 'asc' ? react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortUp }) : react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortDown });
+        }
+        else {
+            return react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSort });
+        }
+    };
     var renderHeader = function () {
         return (react_1.default.createElement("tr", null,
-            react_1.default.createElement("th", { onClick: function () { return handleSort('id'); }, className: "header-cell" }, "ID"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('dateInserted'); }, className: "header-cell" }, "Date Inserted"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('name'); }, className: "header-cell" }, "Name"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('pax'); }, className: "header-cell" }, "Pax"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('room'); }, className: "header-cell" }, "Room"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('vehicle'); }, className: "header-cell" }, "Vehicle"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('pets'); }, className: "header-cell" }, "Pets"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); }, className: "header-cell" }, "Videoke"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); }, className: "header-cell" }, "Partial Payment"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); }, className: "header-cell" }, "Full Payment"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('balance'); }, className: "header-cell" }, "Balance"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); }, className: "header-cell" }, "Fully Paid"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); }, className: "header-cell" }, "Check In"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); }, className: "header-cell" }, "Check Out"),
-            react_1.default.createElement("th", { onClick: function () { return handleSort('user'); }, className: "header-cell" }, "User")));
+            react_1.default.createElement("th", { onClick: function () { return handleSort('id'); }, className: "header-cell" },
+                "ID ",
+                renderSortIcon('id')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('dateInserted'); }, className: "header-cell" },
+                "Date Inserted ",
+                renderSortIcon('dateInserted')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('name'); }, className: "header-cell" },
+                "Name ",
+                renderSortIcon('name')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('pax'); }, className: "header-cell" },
+                "Pax ",
+                renderSortIcon('pax')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('room'); }, className: "header-cell" },
+                "Room ",
+                renderSortIcon('room')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('vehicle'); }, className: "header-cell" },
+                "Vehicle ",
+                renderSortIcon('vehicle')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('pets'); }, className: "header-cell" },
+                "Pets ",
+                renderSortIcon('pets')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('videoke'); }, className: "header-cell" },
+                "Videoke ",
+                renderSortIcon('videoke')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('partial_payment'); }, className: "header-cell" },
+                "Partial Payment ",
+                renderSortIcon('partial_payment')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('full_payment'); }, className: "header-cell" },
+                "Full Payment ",
+                renderSortIcon('full_payment')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('balance'); }, className: "header-cell" },
+                "Balance ",
+                renderSortIcon('balance')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('paid'); }, className: "header-cell" },
+                "Fully Paid ",
+                renderSortIcon('paid')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('checkIn'); }, className: "header-cell" },
+                "Check In ",
+                renderSortIcon('checkIn')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('checkOut'); }, className: "header-cell" },
+                "Check Out ",
+                renderSortIcon('checkOut')),
+            react_1.default.createElement("th", { onClick: function () { return handleSort('user'); }, className: "header-cell" },
+                "User ",
+                renderSortIcon('user'))));
     };
     var renderRows = function () {
         return data.map(function (item, index) { return (react_1.default.createElement("tr", { key: item.id, onClick: function () { return handleExpand(item); }, className: "table-row ".concat(index % 2 === 0 ? 'even-row' : 'odd-row') },
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.id),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.dateInserted),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.name),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pax),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.room),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.vehicle),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.pets ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.videoke ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.partial_payment),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.full_payment),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.balance),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.paid ? 'Yes' : 'No'),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkIn),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.checkOut),
-            react_1.default.createElement("td", { style: { whiteSpace: 'nowrap' } }, item.user))); });
+            react_1.default.createElement("td", { className: "table-cell" }, item.id),
+            react_1.default.createElement("td", { className: "table-cell" }, item.dateInserted),
+            react_1.default.createElement("td", { className: "table-cell" }, item.name),
+            react_1.default.createElement("td", { className: "table-cell" }, item.pax),
+            react_1.default.createElement("td", { className: "table-cell" }, item.room),
+            react_1.default.createElement("td", { className: "table-cell" }, item.vehicle),
+            react_1.default.createElement("td", { className: "table-cell" }, item.pets ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.videoke ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.partial_payment),
+            react_1.default.createElement("td", { className: "table-cell" }, item.full_payment),
+            react_1.default.createElement("td", { className: "table-cell" }, item.balance),
+            react_1.default.createElement("td", { className: "table-cell" }, item.paid ? 'Yes' : 'No'),
+            react_1.default.createElement("td", { className: "table-cell" }, item.checkIn),
+            react_1.default.createElement("td", { className: "table-cell" }, item.checkOut),
+            react_1.default.createElement("td", { className: "table-cell" }, item.user))); });
     };
     return (react_1.default.createElement("div", null,
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
-        react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, striped: true, bordered: true, hover: true },
+        react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, bordered: true, hover: true },
             react_1.default.createElement("thead", null, renderHeader()),
             react_1.default.createElement("tbody", null, renderRows())),
         react_1.default.createElement(react_bootstrap_1.Modal, { show: showModal, onHide: closeModal },

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Modal } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 
 interface MainItem {
   id: number;
@@ -122,27 +124,66 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
+  const renderSortIcon = (column: string) => {
+    if (column === sortColumn) {
+      return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
+    } else {
+      return <FontAwesomeIcon icon={faSort} />;
+    }
+  };
+  
   const renderHeader = () => {
     return (
       <tr>
-        <th onClick={() => handleSort('id')} className="header-cell">ID</th>
-        <th onClick={() => handleSort('dateInserted')} className="header-cell">Date Inserted</th>
-        <th onClick={() => handleSort('name')} className="header-cell">Name</th>
-        <th onClick={() => handleSort('pax')} className="header-cell">Pax</th>
-        <th onClick={() => handleSort('room')} className="header-cell">Room</th>
-        <th onClick={() => handleSort('vehicle')} className="header-cell">Vehicle</th>
-        <th onClick={() => handleSort('pets')} className="header-cell">Pets</th>
-        <th onClick={() => handleSort('videoke')} className="header-cell">Videoke</th>
-        <th onClick={() => handleSort('partial_payment')} className="header-cell">Partial Payment</th>
-        <th onClick={() => handleSort('full_payment')} className="header-cell">Full Payment</th>
-        <th onClick={() => handleSort('balance')} className="header-cell">Balance</th>
-        <th onClick={() => handleSort('paid')} className="header-cell">Fully Paid</th>
-        <th onClick={() => handleSort('checkIn')} className="header-cell">Check In</th>
-        <th onClick={() => handleSort('checkOut')} className="header-cell">Check Out</th>
-        <th onClick={() => handleSort('user')} className="header-cell">User</th>
+        <th onClick={() => handleSort('id')} className="header-cell">
+          ID {renderSortIcon('id')}
+        </th>
+        <th onClick={() => handleSort('dateInserted')} className="header-cell">
+          Date Inserted {renderSortIcon('dateInserted')}
+        </th>
+        <th onClick={() => handleSort('name')} className="header-cell">
+          Name {renderSortIcon('name')}
+        </th>
+        <th onClick={() => handleSort('pax')} className="header-cell">
+          Pax {renderSortIcon('pax')}
+        </th>
+        <th onClick={() => handleSort('room')} className="header-cell">
+          Room {renderSortIcon('room')}
+        </th>
+        <th onClick={() => handleSort('vehicle')} className="header-cell">
+          Vehicle {renderSortIcon('vehicle')}
+        </th>
+        <th onClick={() => handleSort('pets')} className="header-cell">
+          Pets {renderSortIcon('pets')}
+        </th>
+        <th onClick={() => handleSort('videoke')} className="header-cell">
+          Videoke {renderSortIcon('videoke')}
+        </th>
+        <th onClick={() => handleSort('partial_payment')} className="header-cell">
+          Partial Payment {renderSortIcon('partial_payment')}
+        </th>
+        <th onClick={() => handleSort('full_payment')} className="header-cell">
+          Full Payment {renderSortIcon('full_payment')}
+        </th>
+        <th onClick={() => handleSort('balance')} className="header-cell">
+          Balance {renderSortIcon('balance')}
+        </th>
+        <th onClick={() => handleSort('paid')} className="header-cell">
+          Fully Paid {renderSortIcon('paid')}
+        </th>
+        <th onClick={() => handleSort('checkIn')} className="header-cell">
+          Check In {renderSortIcon('checkIn')}
+        </th>
+        <th onClick={() => handleSort('checkOut')} className="header-cell">
+          Check Out {renderSortIcon('checkOut')}
+        </th>
+        <th onClick={() => handleSort('user')} className="header-cell">
+          User {renderSortIcon('user')}
+        </th>
       </tr>
     );
   };
+
 
 
 
@@ -153,21 +194,21 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         onClick={() => handleExpand(item)}
         className={`table-row ${index % 2 === 0 ? 'even-row' : 'odd-row'}`}
       >
-        <td style={{ whiteSpace: 'nowrap' }}>{item.id}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.dateInserted}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.name}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.pax}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.room}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.vehicle}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.pets ? 'Yes' : 'No'}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.videoke ? 'Yes' : 'No'}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.partial_payment}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.full_payment}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.balance}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.paid ? 'Yes' : 'No'}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.checkIn}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.checkOut}</td>
-        <td style={{ whiteSpace: 'nowrap' }}>{item.user}</td>
+        <td className="table-cell">{item.id}</td>
+        <td className="table-cell">{item.dateInserted}</td>
+        <td className="table-cell">{item.name}</td>
+        <td className="table-cell">{item.pax}</td>
+        <td className="table-cell">{item.room}</td>
+        <td className="table-cell">{item.vehicle}</td>
+        <td className="table-cell">{item.pets ? 'Yes' : 'No'}</td>
+        <td className="table-cell">{item.videoke ? 'Yes' : 'No'}</td>
+        <td className="table-cell">{item.partial_payment}</td>
+        <td className="table-cell">{item.full_payment}</td>
+        <td className="table-cell">{item.balance}</td>
+        <td className="table-cell">{item.paid ? 'Yes' : 'No'}</td>
+        <td className="table-cell">{item.checkIn}</td>
+        <td className="table-cell">{item.checkOut}</td>
+        <td className="table-cell">{item.user}</td>
       </tr>
     ));
   };
@@ -178,7 +219,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     <div>
       {user ? 'Hi ' + user : 'You are not logged in'}
       <h1>Main List</h1>
-      <Table responsive striped bordered hover>
+      <Table responsive bordered hover>
         <thead>{renderHeader()}</thead>
         <tbody>{renderRows()}</tbody>
       </Table>
