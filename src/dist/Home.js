@@ -64,14 +64,18 @@ var react_router_dom_1 = require("react-router-dom");
 var react_bootstrap_1 = require("react-bootstrap");
 var react_fontawesome_1 = require("@fortawesome/react-fontawesome");
 var free_solid_svg_icons_1 = require("@fortawesome/free-solid-svg-icons");
+var ITEMS_PER_PAGE = 10;
 var Home = function (_a) {
     var user = _a.user;
     var _b = (0, react_1.useState)([]), data = _b[0], setData = _b[1];
     var _c = (0, react_1.useState)('id'), sortColumn = _c[0], setSortColumn = _c[1];
     var _d = (0, react_1.useState)('asc'), sortOrder = _d[0], setSortOrder = _d[1];
     var navigate = (0, react_router_dom_1.useNavigate)();
-    var _e = (0, react_1.useState)(null), selectedItem = _e[0], setSelectedItem = _e[1]; // Track selected item for modal
+    var _e = (0, react_1.useState)(null), selectedItem = _e[0], setSelectedItem = _e[1];
     var _f = (0, react_1.useState)(false), showModal = _f[0], setShowModal = _f[1];
+    var _g = (0, react_1.useState)(1), currentPage = _g[0], setCurrentPage = _g[1];
+    var _h = (0, react_1.useState)(0), totalItems = _h[0], setTotalItems = _h[1]; // State for total items
+    var _j = (0, react_1.useState)(0), totalPages = _j[0], setTotalPages = _j[1]; // State for total pages
     var handleExpand = function (item) {
         setSelectedItem(item);
         setShowModal(true);
@@ -96,13 +100,16 @@ var Home = function (_a) {
         room: 'asc',
         user: 'asc',
     };
+    (0, react_1.useEffect)(function () {
+        fetchData();
+    }, [sortColumn, sortOrder, currentPage]);
     var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, result, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder), {
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder, "&page=").concat(currentPage, "&perPage=").concat(ITEMS_PER_PAGE), {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -117,7 +124,10 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     result = _a.sent();
-                    setData(result || []);
+                    console.log('Received data:', result);
+                    setData(result.data || []);
+                    setTotalItems(Number(result.total));
+                    setTotalPages(result.total_pages);
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
@@ -127,10 +137,6 @@ var Home = function (_a) {
             }
         });
     }); };
-    (0, react_1.useEffect)(function () {
-        // Call fetchData when the component mounts or when sortColumn/sortOrder changes
-        fetchData();
-    }, [sortColumn, sortOrder]);
     var handleEdit = function (id) {
         navigate("/edit/".concat(id));
     };
@@ -172,6 +178,9 @@ var Home = function (_a) {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
         }
         setSortColumn(column);
+    };
+    var handlePageChange = function (page) {
+        setCurrentPage(page);
     };
     var renderSortIcon = function (column) {
         if (column === sortColumn) {
@@ -253,6 +262,16 @@ var Home = function (_a) {
         react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, bordered: true, hover: true },
             react_1.default.createElement("thead", null, renderHeader()),
             react_1.default.createElement("tbody", null, renderRows())),
+        react_1.default.createElement(react_bootstrap_1.Pagination, null,
+            Array.from({ length: totalPages }, function (_, index) { return (react_1.default.createElement(react_bootstrap_1.Pagination.Item, { key: index + 1, active: index + 1 === currentPage, onClick: function () { return handlePageChange(index + 1); } }, index + 1)); }),
+            react_1.default.createElement(react_bootstrap_1.Pagination.Prev, { onClick: function () { return handlePageChange(currentPage - 1); }, disabled: currentPage === 1 }),
+            react_1.default.createElement(react_bootstrap_1.Pagination.Next, { onClick: function () { return handlePageChange(currentPage + 1); }, disabled: currentPage === totalPages }),
+            react_1.default.createElement("div", { className: "pagination-info" },
+                react_1.default.createElement("span", null,
+                    "Page ",
+                    currentPage,
+                    " of ",
+                    totalPages))),
         react_1.default.createElement(react_bootstrap_1.Modal, { show: showModal, onHide: closeModal },
             react_1.default.createElement(react_bootstrap_1.Modal.Header, { closeButton: true },
                 react_1.default.createElement(react_bootstrap_1.Modal.Title, null, "Details")),

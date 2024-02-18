@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal } from 'react-bootstrap';
+import { Table, Button, Modal, Pagination } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -26,13 +26,18 @@ interface HomeProps {
   user: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const Home: React.FC<HomeProps> = ({ user }) => {
   const [data, setData] = useState<MainItem[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
-  const [selectedItem, setSelectedItem] = useState<MainItem | null>(null); // Track selected item for modal
+  const [selectedItem, setSelectedItem] = useState<MainItem | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0); // State for total items
+  const [totalPages, setTotalPages] = useState(0); // State for total pages
 
   const handleExpand = (item: MainItem) => {
     setSelectedItem(item);
@@ -60,34 +65,43 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     room: 'asc',
     user: 'asc',
   };
+  useEffect(() => {
+    fetchData();
+  }, [sortColumn, sortOrder, currentPage]);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}`, {
+
+
+const fetchData = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}`,
+      {
         headers: {
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
         credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+    );
 
-      const result = await response.json();
-      setData(result || []);
-    } catch (error: any) {
-      console.error('Error fetching data:', error.message);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-  };
 
-  useEffect(() => {
-    // Call fetchData when the component mounts or when sortColumn/sortOrder changes
-    fetchData();
-  }, [sortColumn, sortOrder]);
+    const result = await response.json();
+    console.log('Received data:', result);
 
+    setData(result.data || []);
 
+    setTotalItems(Number(result.total));
+    setTotalPages(result.total_pages);
+    
+  } catch (error: any) {
+    console.error('Error fetching data:', error.message);
+  }
+};
+
+  
   const handleEdit = (id: number) => {
     navigate(`/edit/${id}`);
   };
@@ -124,6 +138,10 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const renderSortIcon = (column: string) => {
     if (column === sortColumn) {
       return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
@@ -131,7 +149,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       return <FontAwesomeIcon icon={faSort} />;
     }
   };
-  
+
   const renderHeader = () => {
     return (
       <tr>
@@ -214,7 +232,6 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
 
-
   return (
     <div>
       {user ? 'Hi ' + user : 'You are not logged in'}
@@ -224,7 +241,36 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         <tbody>{renderRows()}</tbody>
       </Table>
 
-      {/* Modal for expanded view */}
+      <Pagination>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <Pagination.Item
+            key={index + 1}
+            active={index + 1 === currentPage}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
+
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        />
+
+        <div className="pagination-info">
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+        </div>
+      </Pagination>
+
+
+
       <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>Details</Modal.Title>
@@ -263,5 +309,4 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     </div>
   );
 };
-
 export default Home;
