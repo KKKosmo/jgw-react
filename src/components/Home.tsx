@@ -54,36 +54,22 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
-
   const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  const selectedValue = event.target.value;
+    const selectedValue = event.target.value;
+  
+    const [numericMonth, year] = selectedValue.split(' ');
+    
+    const selectedStartDate = new Date(`${year}-${numericMonth}-01`);
+    selectedStartDate.setHours(16);
+  
+    const lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
+    lastDayOfMonth.setHours(16);
 
-  // Extract month and year separately
-  const [numericMonth, year] = selectedValue.split(' ');
-
-  // Convert numeric month to month name
-  const monthName = new Date(`${year}-${numericMonth}-01`).toLocaleDateString('en-US', {
-    month: 'short', // Use 'short' for abbreviated month name (MMM)
-  });
-
-  console.log('Selected Month:', monthName);
-  console.log('Selected Year:', year);
-
-  // Automatically set start and end dates based on the selected month
-  const selectedStartDate = new Date(`${year}-${numericMonth}-01`).toISOString().split('T')[0];
-  const lastDayOfMonth = new Date(parseInt(year), parseInt(numericMonth, 10), 0).getDate();
-  const selectedEndDate = new Date(`${year}-${numericMonth}-${lastDayOfMonth}`).toISOString().split('T')[0];
-
-  // Update the state with the selected month
-  setSelectedMonth(`${numericMonth} ${year}`);
-
-  // Update the start and end dates
-  setStartDate(selectedStartDate);
-  setEndDate(selectedEndDate);
-
-  // Other logic...
-};
-
+    setSelectedMonth(`${numericMonth} ${year}`);
+    setStartDate(selectedStartDate.toISOString().split('T')[0]);
+    setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+  };
+  
 
 
 
