@@ -409,6 +409,10 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           <span>
             Page {currentPage} of {totalPages}
           </span>
+          <br></br>
+          <span>
+            Items {data.length} of {totalItems}
+          </span>
         </div>
       </Pagination>
 
