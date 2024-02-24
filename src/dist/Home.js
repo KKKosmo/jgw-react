@@ -88,24 +88,14 @@ var Home = function (_a) {
     };
     var handleMonthChange = function (event) {
         var selectedValue = event.target.value;
-        // Extract month and year separately
         var _a = selectedValue.split(' '), numericMonth = _a[0], year = _a[1];
-        // Convert numeric month to month name
-        var monthName = new Date("".concat(year, "-").concat(numericMonth, "-01")).toLocaleDateString('en-US', {
-            month: 'short', // Use 'short' for abbreviated month name (MMM)
-        });
-        console.log('Selected Month:', monthName);
-        console.log('Selected Year:', year);
-        // Automatically set start and end dates based on the selected month
-        var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01")).toISOString().split('T')[0];
-        var lastDayOfMonth = new Date(parseInt(year), parseInt(numericMonth, 10), 0).getDate();
-        var selectedEndDate = new Date("".concat(year, "-").concat(numericMonth, "-").concat(lastDayOfMonth)).toISOString().split('T')[0];
-        // Update the state with the selected month
+        var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01"));
+        selectedStartDate.setHours(16);
+        var lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
+        lastDayOfMonth.setHours(16);
         setSelectedMonth("".concat(numericMonth, " ").concat(year));
-        // Update the start and end dates
-        setStartDate(selectedStartDate);
-        setEndDate(selectedEndDate);
-        // Other logic...
+        setStartDate(selectedStartDate.toISOString().split('T')[0]);
+        setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
     };
     var generateMonthOptions = function () {
         var options = [];
@@ -340,7 +330,13 @@ var Home = function (_a) {
                     "Page ",
                     currentPage,
                     " of ",
-                    totalPages))),
+                    totalPages),
+                react_1.default.createElement("br", null),
+                react_1.default.createElement("span", null,
+                    "Items ",
+                    data.length,
+                    " of ",
+                    totalItems))),
         react_1.default.createElement(react_bootstrap_1.Modal, { show: showModal, onHide: closeModal },
             react_1.default.createElement(react_bootstrap_1.Modal.Header, { closeButton: true },
                 react_1.default.createElement(react_bootstrap_1.Modal.Title, null, "Details")),
