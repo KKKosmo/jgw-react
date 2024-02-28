@@ -82,7 +82,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // src/components/MainFormSubmit.js
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
-var MainFormSubmit = function (props) {
+var EditForm = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
     var user = props.user;
     var id = (0, react_router_dom_1.useParams)().id; // Get the ID from the route parameters
@@ -145,13 +145,13 @@ var MainFormSubmit = function (props) {
     };
     var handleCheckboxChange = function (e) {
         var _a = e.target, name = _a.name, checked = _a.checked;
-        if (name === 'exclusive' && checked) {
-            setSelectedRooms(['EXCLUSIVE']);
+        if (name === 'e' && checked) {
+            setSelectedRooms(['E']);
         }
         else {
             setSelectedRooms(function (prevRooms) {
                 if (checked) {
-                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'EXCLUSIVE'; }), true), [name.toUpperCase()], false);
+                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'E'; }), true), [name.toUpperCase()], false);
                 }
                 else {
                     return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
@@ -245,8 +245,8 @@ var MainFormSubmit = function (props) {
                 "KUBO 1",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "k2", checked: selectedRooms.includes('K2'), onChange: handleCheckboxChange }),
                 "KUBO 2",
-                react_1.default.createElement("input", { className: "input", type: "checkbox", name: "exclusive", checked: selectedRooms.includes('EXCLUSIVE'), onChange: handleCheckboxChange }),
+                react_1.default.createElement("input", { className: "input", type: "checkbox", name: "e", checked: selectedRooms.includes('E'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
             react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Update"))));
 };
-exports.default = MainFormSubmit;
+exports.default = EditForm;

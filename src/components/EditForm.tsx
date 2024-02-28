@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const MainFormSubmit = (props: { user: string }) => {
+const EditForm = (props: { user: string }) => {
   const navigate = useNavigate();
   const { user } = props;
   const { id } = useParams(); // Get the ID from the route parameters
@@ -76,12 +76,12 @@ const MainFormSubmit = (props: { user: string }) => {
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
 
-    if (name === 'exclusive' && checked) {
-      setSelectedRooms(['EXCLUSIVE']);
+    if (name === 'e' && checked) {
+      setSelectedRooms(['E']);
     } else {
       setSelectedRooms((prevRooms) => {
         if (checked) {
-          return [...prevRooms.filter((room) => room !== 'EXCLUSIVE'), name.toUpperCase()];
+          return [...prevRooms.filter((room) => room !== 'E'), name.toUpperCase()];
         } else {
           return prevRooms.filter((room) => room !== name.toUpperCase());
         }
@@ -247,8 +247,8 @@ const MainFormSubmit = (props: { user: string }) => {
           <input
             className="input"
             type="checkbox"
-            name="exclusive"
-            checked={selectedRooms.includes('EXCLUSIVE')}
+            name="e"
+            checked={selectedRooms.includes('E')}
             onChange={handleCheckboxChange}
           />
           EXCLUSIVE
@@ -266,4 +266,4 @@ const MainFormSubmit = (props: { user: string }) => {
   );
 };
 
-export default MainFormSubmit;
+export default EditForm;

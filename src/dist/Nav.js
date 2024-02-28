@@ -94,7 +94,9 @@ var Nav = function (props) {
             react_1.default.createElement("li", { className: "nav-item active" },
                 react_1.default.createElement(react_router_dom_1.Link, { to: "/login", className: "nav-link", onClick: function () { logout(); } }, "Logout")),
             react_1.default.createElement("li", { className: "nav-item active" },
-                react_1.default.createElement(react_router_dom_1.Link, { to: "/MainFormSubmit", className: "nav-link", onClick: handleNavCollapse }, "New Book"))));
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/MainFormSubmit", className: "nav-link", onClick: handleNavCollapse }, "New Book")),
+            react_1.default.createElement("li", { className: "nav-item active" },
+                react_1.default.createElement(react_router_dom_1.Link, { to: "/eventHistory", className: "nav-link", onClick: handleNavCollapse }, "Event History"))));
     }
     return (react_1.default.createElement("nav", { className: "navbar navbar-expand-md navbar-dark bg-dark mb-4" },
         react_1.default.createElement("div", { className: "container-fluid" },

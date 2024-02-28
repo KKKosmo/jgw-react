@@ -39,6 +39,9 @@ const Nav = (props: { name: string, setUser: (name: string) => void }) => {
                 <li className="nav-item active">
                     <Link to="/MainFormSubmit" className="nav-link" onClick={handleNavCollapse}>New Book</Link>
                 </li>
+                <li className="nav-item active">
+                    <Link to="/eventHistory" className="nav-link" onClick={handleNavCollapse}>Event History</Link>
+                </li>
             </ul>
         )
     }

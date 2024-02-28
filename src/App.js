@@ -6,6 +6,7 @@ import Nav from "./dist/Nav";
 import Home from "./dist/Home";
 import MainFormSubmit from "./dist/MainFormSubmit";
 import EditForm from './dist/EditForm';
+import EventHistory from './dist/EventHistory';
 
 function App() {
     const [user, setUser] = useState('');
@@ -36,6 +37,7 @@ function App() {
                         <Route path="/" element={<Home user={user} />}></Route>
                         <Route path="/login" element={<Login setUser={setUser} />}></Route>
                         <Route path="/mainFormSubmit" element={<MainFormSubmit user={user} />}></Route>
+                        <Route path="/eventHistory" element={<EventHistory />} />
                         <Route path="/edit/:id" element={<EditForm />} />
                     </Routes>
                 </main>
