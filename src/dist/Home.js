@@ -90,6 +90,10 @@ var Home = function (_a) {
     var _m = (0, react_1.useState)(''), startDate = _m[0], setStartDate = _m[1];
     var _o = (0, react_1.useState)(''), endDate = _o[0], setEndDate = _o[1];
     var _p = (0, react_1.useState)([]), roomSelection = _p[0], setRoomSelection = _p[1];
+    var _q = (0, react_1.useState)(false), dateFiltersVisible = _q[0], setDateFiltersVisible = _q[1];
+    var handleToggleDateFilters = function () {
+        setDateFiltersVisible(!dateFiltersVisible);
+    };
     var handleRoomChange = function (room) {
         var updatedSelection = roomSelection.includes(room)
             ? roomSelection.filter(function (selectedRoom) { return selectedRoom !== room; })
@@ -104,14 +108,21 @@ var Home = function (_a) {
     };
     var handleMonthChange = function (event) {
         var selectedValue = event.target.value;
-        var _a = selectedValue.split(' '), numericMonth = _a[0], year = _a[1];
-        var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01"));
-        selectedStartDate.setHours(16);
-        var lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
-        lastDayOfMonth.setHours(16);
-        setSelectedMonth("".concat(numericMonth, " ").concat(year));
-        setStartDate(selectedStartDate.toISOString().split('T')[0]);
-        setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+        if (selectedValue == 'none') {
+            setSelectedMonth("");
+            setStartDate('');
+            setEndDate('');
+        }
+        else {
+            var _a = selectedValue.split(' '), numericMonth = _a[0], year = _a[1];
+            var selectedStartDate = new Date("".concat(year, "-").concat(numericMonth, "-01"));
+            selectedStartDate.setHours(16);
+            var lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
+            lastDayOfMonth.setHours(16);
+            setSelectedMonth("".concat(numericMonth, " ").concat(year));
+            setStartDate(selectedStartDate.toISOString().split('T')[0]);
+            setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+        }
     };
     var generateMonthOptions = function () {
         var options = [];
@@ -161,7 +172,7 @@ var Home = function (_a) {
     }, [sortColumn, sortOrder, currentPage]);
     var handleResetFilters = function () {
         setNameFilter('');
-        setSelectedMonth('');
+        setSelectedMonth('none');
         setStartDate('');
         setEndDate('');
         setRoomSelection([]);
@@ -337,12 +348,14 @@ var Home = function (_a) {
                 react_1.default.createElement("input", { type: "text", id: "nameFilter", value: nameFilter, onChange: handleNameChange }),
                 react_1.default.createElement("label", { htmlFor: "monthSelector" }, "Select Month:"),
                 react_1.default.createElement("select", { id: "monthSelector", value: selectedMonth, onChange: handleMonthChange },
-                    react_1.default.createElement("option", { value: "", disabled: true }, "Select Month"),
+                    react_1.default.createElement("option", { value: "none" }, "none"),
                     generateMonthOptions()),
-                react_1.default.createElement("label", { htmlFor: "startDate" }, "Start Date:"),
-                react_1.default.createElement("input", { type: "date", id: "startDate", value: startDate, onChange: handleStartDateChange }),
-                react_1.default.createElement("label", { htmlFor: "endDate" }, "End Date:"),
-                react_1.default.createElement("input", { type: "date", id: "endDate", value: endDate, onChange: handleEndDateChange }),
+                react_1.default.createElement("button", { onClick: handleToggleDateFilters }, dateFiltersVisible ? 'Hide Advanced Date Filters' : 'Show Advanced Date Filters'),
+                dateFiltersVisible && (react_1.default.createElement(react_1.default.Fragment, null,
+                    react_1.default.createElement("label", { htmlFor: "startDate" }, "Start Date:"),
+                    react_1.default.createElement("input", { type: "date", id: "startDate", value: startDate, onChange: handleStartDateChange }),
+                    react_1.default.createElement("label", { htmlFor: "endDate" }, "End Date:"),
+                    react_1.default.createElement("input", { type: "date", id: "endDate", value: endDate, onChange: handleEndDateChange }))),
                 react_1.default.createElement("label", null, "Rooms:"),
                 ['J', 'G', 'K1', 'K2', 'A', 'E'].map(function (room) { return (react_1.default.createElement("label", { key: room },
                     react_1.default.createElement("input", { type: "checkbox", value: room, checked: roomSelection.includes(room), onChange: function () { return handleRoomChange(room); } }),

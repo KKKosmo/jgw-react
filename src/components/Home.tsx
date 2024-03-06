@@ -43,7 +43,11 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [roomSelection, setRoomSelection] = useState<string[]>([]);
+  const [dateFiltersVisible, setDateFiltersVisible] = useState(false);
 
+  const handleToggleDateFilters = () => {
+    setDateFiltersVisible(!dateFiltersVisible);
+  };
 
   const handleRoomChange = (room: string) => {
     const updatedSelection = roomSelection.includes(room)
@@ -66,18 +70,25 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
-
-    const [numericMonth, year] = selectedValue.split(' ');
-
-    const selectedStartDate = new Date(`${year}-${numericMonth}-01`);
-    selectedStartDate.setHours(16);
-
-    const lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
-    lastDayOfMonth.setHours(16);
-
-    setSelectedMonth(`${numericMonth} ${year}`);
-    setStartDate(selectedStartDate.toISOString().split('T')[0]);
-    setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+    if(selectedValue == 'none'){
+      
+    setSelectedMonth(``);
+    setStartDate('');
+    setEndDate('');
+    }
+    else{
+      const [numericMonth, year] = selectedValue.split(' ');
+  
+      const selectedStartDate = new Date(`${year}-${numericMonth}-01`);
+      selectedStartDate.setHours(16);
+  
+      const lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
+      lastDayOfMonth.setHours(16);
+  
+      setSelectedMonth(`${numericMonth} ${year}`);
+      setStartDate(selectedStartDate.toISOString().split('T')[0]);
+      setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+    }
   };
 
 
@@ -151,7 +162,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
   const handleResetFilters = () => {
     setNameFilter('');
-    setSelectedMonth('');
+    setSelectedMonth('none');
     setStartDate('');
     setEndDate('');
     setRoomSelection([]);
@@ -360,27 +371,35 @@ const Home: React.FC<HomeProps> = ({ user }) => {
             value={selectedMonth}
             onChange={handleMonthChange}
           >
-            <option value="" disabled>Select Month</option>
+            <option value="none">none</option>
             {generateMonthOptions()}
           </select>
 
-          <label htmlFor="startDate">Start Date:</label>
-          <input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={handleStartDateChange}
-          />
+          {/* Toggle button for date filters */}
+          <button onClick={handleToggleDateFilters}>
+            {dateFiltersVisible ? 'Hide Advanced Date Filters' : 'Show Advanced Date Filters'}
+          </button>
 
-          <label htmlFor="endDate">End Date:</label>
-          <input
-            type="date"
-            id="endDate"
-            value={endDate}
-            onChange={handleEndDateChange}
-          />
+          {/* Date filters (visible only when dateFiltersVisible is true) */}
+          {dateFiltersVisible && (
+            <>
+              <label htmlFor="startDate">Start Date:</label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={handleStartDateChange}
+              />
 
-
+              <label htmlFor="endDate">End Date:</label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={handleEndDateChange}
+              />
+            </>
+          )}
 
 
 
