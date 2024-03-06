@@ -31,7 +31,7 @@ const ITEMS_PER_PAGE = 10;
 const Home: React.FC<HomeProps> = ({ user }) => {
   const [data, setData] = useState<MainItem[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>('id');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<MainItem | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -42,6 +42,16 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [roomSelection, setRoomSelection] = useState<string[]>([]);
+
+
+  const handleRoomChange = (room: string) => {
+    const updatedSelection = roomSelection.includes(room)
+      ? roomSelection.filter((selectedRoom) => selectedRoom !== room)
+      : [...roomSelection, room];
+    setRoomSelection(updatedSelection);
+  };
+
 
   const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStartDate(event.target.value);
@@ -50,18 +60,18 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEndDate(event.target.value);
   };
-  
+
 
 
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
-  
+
     const [numericMonth, year] = selectedValue.split(' ');
-    
+
     const selectedStartDate = new Date(`${year}-${numericMonth}-01`);
     selectedStartDate.setHours(16);
-  
+
     const lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
     lastDayOfMonth.setHours(16);
 
@@ -69,7 +79,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     setStartDate(selectedStartDate.toISOString().split('T')[0]);
     setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
   };
-  
+
 
 
 
@@ -79,19 +89,19 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     const options = [];
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
-  
+
     const startYear = 2023;
     const startMonth = 12;
-  
+
     // Calculate the difference in months between the current date and December 2023
     const monthsDifference = (currentYear - startYear) * 12 + currentMonth - startMonth + 1;
-  
+
     for (let i = 0; i < monthsDifference + 3; i++) {
       const monthValue = (startMonth + i) % 12 || 12; // Ensure values are between 1 and 12
       const year = startYear + Math.floor((startMonth + i - 1) / 12);
-  
+
       const optionValue = `${monthValue} ${year}`;
-  
+
       options.push(
         <option key={`${year}-${monthValue}`} value={optionValue}>
           {new Date(year, monthValue - 1, 1).toLocaleDateString('en-US', {
@@ -101,11 +111,11 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         </option>
       );
     }
-  
+
     return options;
   };
-  
-  
+
+
 
 
   const handleExpand = (item: MainItem) => {
@@ -118,7 +128,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
   const defaultOrders: Record<string, 'asc' | 'desc'> = {
-    id: 'asc',
+    id: 'desc',
     dateInserted: 'desc', // Set to 'desc' for dateInserted
     name: 'asc',
     pax: 'asc',
@@ -134,15 +144,31 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     room: 'asc',
     user: 'asc',
   };
+
   useEffect(() => {
     fetchData();
   }, [sortColumn, sortOrder, currentPage]);
 
+  const handleResetFilters = () => {
+    setNameFilter('');
+    setSelectedMonth('');
+    setStartDate('');
+    setEndDate('');
+    setRoomSelection([]);
+    setSortColumn('id');
+    setSortOrder('desc');
+  };
+
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNameFilter(event.target.value);
+  };
 
   const fetchData = async () => {
     try {
+      const roomFilter = roomSelection.join(',');
       const response = await fetch(
-        `http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}&name=${nameFilter}&startDate=${startDate}&endDate=${endDate}`,
+        `http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}&name=${nameFilter}&startDate=${startDate}&endDate=${endDate}&rooms=${roomFilter}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -167,7 +193,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
 
-  
+
   const handleEdit = (id: number) => {
     navigate(`/edit/${id}`);
   };
@@ -206,14 +232,13 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNameFilter(event.target.value);
-  };
 
   const handleFilter = () => {
     // Trigger fetching data with the updated name filter
     fetchData();
   };
+
+
   const renderSortIcon = (column: string) => {
     if (column === sortColumn) {
       return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
@@ -355,7 +380,30 @@ const Home: React.FC<HomeProps> = ({ user }) => {
             onChange={handleEndDateChange}
           />
 
+
+
+
+
+          <label>Rooms:</label>
+          {['J', 'G', 'K1', 'K2', 'A', 'E'].map((room) => (
+            <label key={room}>
+              <input
+                type="checkbox"
+                value={room}
+                checked={roomSelection.includes(room)}
+                onChange={() => handleRoomChange(room)}
+              />
+              {room}
+            </label>
+          ))}
+
+
+
+
+
+
           <button onClick={handleFilter}>Apply Filters</button>
+          <button onClick={handleResetFilters}>Reset Filters</button>
         </div>
       </div>
 

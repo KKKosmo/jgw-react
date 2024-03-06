@@ -152,3 +152,14 @@
 .table-cell {
   white-space: nowrap;
 }
+
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.checkbox-container label {
+  margin-left: 5px;
+}
