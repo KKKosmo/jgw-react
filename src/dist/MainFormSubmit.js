@@ -115,13 +115,25 @@ var MainFormSubmit = function (props) {
         room: '',
     }), formData = _b[0], setFormData = _b[1];
     var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
-    var currentDate = new Date();
-    var _d = (0, react_1.useState)("".concat(monthNames[currentDate.getMonth()])), calendarMonth = _d[0], setCalendarMonth = _d[1];
+    var _d = (0, react_1.useState)(new Date()), currentDate = _d[0], setCurrentDate = _d[1];
+    var _e = (0, react_1.useState)(), calendarMonth = _e[0], setCalendarMonth = _e[1];
+    // const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
     (0, react_1.useEffect)(function () {
+        setCalendarMonth("".concat(monthNames[currentDate.getMonth()]));
         getNewSet(currentDate.toDateString(), currentDate.toDateString());
         return function () {
         };
-    }, []);
+    }, [currentDate]);
+    var handlePrevMonth = function () {
+        var prevMonth = new Date(currentDate);
+        prevMonth.setMonth(prevMonth.getMonth() - 1);
+        setCurrentDate(prevMonth);
+    };
+    var handleNextMonth = function () {
+        var nextMonth = new Date(currentDate);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        setCurrentDate(nextMonth);
+    };
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -386,6 +398,11 @@ var MainFormSubmit = function (props) {
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "e", checked: selectedRooms.includes('E'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
             react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Submit")),
-        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData, calendarMonth: calendarMonth })));
+        react_1.default.createElement("div", null,
+            react_1.default.createElement("button", { onClick: handlePrevMonth }, "Previous Month"),
+            react_1.default.createElement("button", { onClick: handleNextMonth }, "Next Month"),
+            react_1.default.createElement("h1", { id: 'calendarMonth' },
+                react_1.default.createElement("span", null, "".concat(monthNames[currentDate.getMonth()], " ").concat(currentDate.getFullYear())))),
+        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData })));
 };
 exports.default = MainFormSubmit;

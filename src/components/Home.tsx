@@ -194,7 +194,6 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       }
 
       const result = await response.json();
-
       setData(result.data || []);
       setTotalItems(result.total || 0);
       setTotalPages(Math.ceil(result.total / ITEMS_PER_PAGE));

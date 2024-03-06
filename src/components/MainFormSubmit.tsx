@@ -46,19 +46,35 @@ const MainFormSubmit = (props: { user: string }) => {
 
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
 
-  const currentDate = new Date();
 
-  const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const [calendarMonth, setCalendarMonth] = useState<string>();
+  // const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
+
 
 
   useEffect(() => {
-    getNewSet(currentDate.toDateString(), currentDate.toDateString());
+    setCalendarMonth(`${monthNames[currentDate.getMonth()]}`);
 
+    getNewSet(currentDate.toDateString(), currentDate.toDateString());
     return () => {
     };
-  }, []);
+  }, [currentDate]);
 
 
+
+  const handlePrevMonth = () => {
+    const prevMonth = new Date(currentDate);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    setCurrentDate(prevMonth);
+  };
+
+  const handleNextMonth = () => {
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    setCurrentDate(nextMonth);
+  };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -138,33 +154,33 @@ const MainFormSubmit = (props: { user: string }) => {
         },
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       interface ApiResponse {
         dayNumber: string[];
         data: string[];
       }
-  
+
       const jsonData: ApiResponse = await response.json();
-  
+
       setCalendarData(prevCalendarData => {
         const updatedData = prevCalendarData.map((item, index) => {
           const dayNumber = jsonData.dayNumber[index] || '';
           const data = jsonData.data[index] || '';
-  
+
           const blockData = data.split(',').map(item => item.trim());
           let isBlockDataValid = true;
-  
+
           for (const element of selectedRooms) {
             if (!blockData.includes(element)) {
               isBlockDataValid = false;
               break;
             }
           }
-  
+
           return {
             ...item,
             dayNumber,
@@ -172,20 +188,20 @@ const MainFormSubmit = (props: { user: string }) => {
             availability: isBlockDataValid,
           };
         });
-  
+
         return updatedData;
       });
-  
+
     } catch (error) {
       console.error('Error fetching data from the API:', error);
     }
   };
-  
+
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
       const checkInDate = new Date(formData.checkIn);
       console.log(checkInDate.getMonth());
-      if(calendarMonth !== monthNames[checkInDate.getMonth()]){
+      if (calendarMonth !== monthNames[checkInDate.getMonth()]) {
 
         // const checkOutDate = new Date(formData.checkOut);
 
@@ -193,16 +209,16 @@ const MainFormSubmit = (props: { user: string }) => {
         //   getNewSet(formData.checkIn, formData.checkOut);
         // }
         // else {
-          getNewSet(formData.checkIn, formData.checkIn);
+        getNewSet(formData.checkIn, formData.checkIn);
         // }
-  
+
         const dateObject = new Date(formData.checkIn);
         const monthIndex = dateObject.getMonth();
-  
+
         setCalendarMonth(monthNames[monthIndex]);
       }
 
-      
+
     }
   }, [formData.checkIn]);
 
@@ -210,19 +226,19 @@ const MainFormSubmit = (props: { user: string }) => {
     if (formData.checkIn && formData.checkOut) {
       const checkOutDate = new Date(formData.checkOut);
 
-      if(calendarMonth !== monthNames[checkOutDate.getMonth()]){
+      if (calendarMonth !== monthNames[checkOutDate.getMonth()]) {
         // const checkInDate = new Date(formData.checkIn);
-  
+
         // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
         //   getNewSet(formData.checkIn, formData.checkOut);
         // }
         // else {
-          getNewSet(formData.checkOut, formData.checkOut);
+        getNewSet(formData.checkOut, formData.checkOut);
         // }
-  
+
         const dateObject = new Date(formData.checkOut);
         const monthIndex = dateObject.getMonth();
-  
+
         setCalendarMonth(monthNames[monthIndex]);
       }
 
@@ -233,25 +249,25 @@ const MainFormSubmit = (props: { user: string }) => {
 
   useEffect(() => {
     // if (formData.checkIn && formData.checkOut) {
-      setCalendarData(prevCalendarData => {
-        const updatedData = prevCalendarData.map(item => {
-          const blockData = item.data.split(',').map(item => item.trim());
-          let isBlockDataValid = true;
-  
-          for (const element of selectedRooms) {
-            if (!blockData.includes(element)) {
-              isBlockDataValid = false;
-              break;
-            }
+    setCalendarData(prevCalendarData => {
+      const updatedData = prevCalendarData.map(item => {
+        const blockData = item.data.split(',').map(item => item.trim());
+        let isBlockDataValid = true;
+
+        for (const element of selectedRooms) {
+          if (!blockData.includes(element)) {
+            isBlockDataValid = false;
+            break;
           }
-  
-          return {
-            ...item,
-            availability: isBlockDataValid,
-          };
-        });
-        return updatedData;
+        }
+
+        return {
+          ...item,
+          availability: isBlockDataValid,
+        };
       });
+      return updatedData;
+    });
     // }
   }, [selectedRooms]);
 
@@ -417,7 +433,15 @@ const MainFormSubmit = (props: { user: string }) => {
         </button>
       </form>
 
-      <Calendar calendarData={calendarData} calendarMonth={calendarMonth} />
+      <div>
+        <button onClick={handlePrevMonth}>Previous Month</button>
+        <button onClick={handleNextMonth}>Next Month</button>
+        <h1 id='calendarMonth'>
+          <span>{`${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`}</span>
+        </h1>
+      </div>
+
+      <Calendar calendarData={calendarData} />
 
     </div>
   );

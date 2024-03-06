@@ -20,7 +20,6 @@ function App() {
                 });
 
                 const content = await response.json();
-                console.log(content.name);
                 setUser(content.name);
             }
         )();

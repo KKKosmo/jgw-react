@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importDefault(require("react"));
 var Calendar = function (_a) {
-    var calendarData = _a.calendarData, calendarMonth = _a.calendarMonth;
+    var calendarData = _a.calendarData;
     // Function to chunk the array into rows
     var chunkArray = function (array, size) {
         return Array.from({ length: Math.ceil(array.length / size) }, function (_, index) {
@@ -15,7 +15,6 @@ var Calendar = function (_a) {
     // Chunk the calendarData array into rows of 7 columns
     var calendarRows = chunkArray(calendarData, 7);
     return (react_1.default.createElement("div", { className: "container" },
-        react_1.default.createElement("h1", { id: 'calendarMonth' }, calendarMonth),
         react_1.default.createElement("div", { className: "row days-row" },
             react_1.default.createElement("div", { className: "col" }, "Sun"),
             react_1.default.createElement("div", { className: "col" }, "Mon"),

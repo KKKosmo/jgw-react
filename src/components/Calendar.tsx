@@ -11,7 +11,7 @@ interface CalendarProps {
   calendarMonth?: string;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ calendarData, calendarMonth}) => {
+const Calendar: React.FC<CalendarProps> = ({ calendarData}) => {
   // Function to chunk the array into rows
   const chunkArray = (array: Array<CalendarData>, size: number) =>
     Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
@@ -26,9 +26,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarData, calendarMonth}) => {
   
   return (
     <div className="container">
-      <h1 id='calendarMonth'>
-         {calendarMonth}
-      </h1>
       <div className="row days-row">
         <div className="col">Sun</div>
         <div className="col">Mon</div>
