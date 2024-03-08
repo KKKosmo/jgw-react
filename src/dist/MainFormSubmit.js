@@ -134,29 +134,6 @@ var MainFormSubmit = function (props) {
         nextMonth.setMonth(nextMonth.getMonth() + 1);
         setCurrentDate(nextMonth);
     };
-    var handleInputChange = function (e) {
-        var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
-        setFormData(function (prevData) {
-            var _a;
-            return (__assign(__assign({}, prevData), (_a = {}, _a[name] = type === 'radio' ? value === 'true' : value, _a)));
-        });
-    };
-    var handleCheckboxChange = function (e) {
-        var _a = e.target, name = _a.name, checked = _a.checked;
-        if (name === 'e' && checked) {
-            setSelectedRooms(['E']);
-        }
-        else {
-            setSelectedRooms(function (prevRooms) {
-                if (checked) {
-                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'E'; }), true), [name.toUpperCase()], false);
-                }
-                else {
-                    return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
-                }
-            });
-        }
-    };
     var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
         var link, response, errorData, errorMessage, data, error_1;
         return __generator(this, function (_a) {
@@ -306,6 +283,29 @@ var MainFormSubmit = function (props) {
         });
         // }
     }, [selectedRooms]);
+    var handleInputChange = function (e) {
+        var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
+        setFormData(function (prevData) {
+            var _a;
+            return (__assign(__assign({}, prevData), (_a = {}, _a[name] = type === 'radio' ? value === 'true' : value, _a)));
+        });
+    };
+    var handleCheckboxChange = function (e) {
+        var _a = e.target, name = _a.name, checked = _a.checked;
+        if (name === 'e' && checked) {
+            setSelectedRooms(['E']);
+        }
+        else {
+            setSelectedRooms(function (prevRooms) {
+                if (checked) {
+                    return __spreadArray(__spreadArray([], prevRooms.filter(function (room) { return room !== 'E'; }), true), [name.toUpperCase()], false);
+                }
+                else {
+                    return prevRooms.filter(function (room) { return room !== name.toUpperCase(); });
+                }
+            });
+        }
+    };
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formattedRoom, response, data, error_3;
         return __generator(this, function (_a) {

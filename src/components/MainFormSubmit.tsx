@@ -52,8 +52,6 @@ const MainFormSubmit = (props: { user: string }) => {
   const [calendarMonth, setCalendarMonth] = useState<string>();
   // const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
 
-
-
   useEffect(() => {
     setCalendarMonth(`${monthNames[currentDate.getMonth()]}`);
 
@@ -61,8 +59,6 @@ const MainFormSubmit = (props: { user: string }) => {
     return () => {
     };
   }, [currentDate]);
-
-
 
   const handlePrevMonth = () => {
     const prevMonth = new Date(currentDate);
@@ -75,34 +71,6 @@ const MainFormSubmit = (props: { user: string }) => {
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     setCurrentDate(nextMonth);
   };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === 'radio' ? value === 'true' : value,
-    }));
-
-
-  };
-
-  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-
-    if (name === 'e' && checked) {
-      setSelectedRooms(['E']);
-    } else {
-      setSelectedRooms((prevRooms) => {
-        if (checked) {
-          return [...prevRooms.filter((room) => room !== 'E'), name.toUpperCase()];
-        } else {
-          return prevRooms.filter((room) => room !== name.toUpperCase());
-        }
-      });
-    }
-  };
-
 
   const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
     try {
@@ -246,7 +214,6 @@ const MainFormSubmit = (props: { user: string }) => {
     }
   }, [formData.checkOut]);
 
-
   useEffect(() => {
     // if (formData.checkIn && formData.checkOut) {
     setCalendarData(prevCalendarData => {
@@ -271,6 +238,32 @@ const MainFormSubmit = (props: { user: string }) => {
     // }
   }, [selectedRooms]);
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === 'radio' ? value === 'true' : value,
+    }));
+
+
+  };
+
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+
+    if (name === 'e' && checked) {
+      setSelectedRooms(['E']);
+    } else {
+      setSelectedRooms((prevRooms) => {
+        if (checked) {
+          return [...prevRooms.filter((room) => room !== 'E'), name.toUpperCase()];
+        } else {
+          return prevRooms.filter((room) => room !== name.toUpperCase());
+        }
+      });
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
