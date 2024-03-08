@@ -46,11 +46,9 @@ const MainFormSubmit = (props: { user: string }) => {
 
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
 
-
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const [calendarMonth, setCalendarMonth] = useState<string>();
-  // const [calendarMonth, setCalendarMonth] = useState<string>(`${monthNames[currentDate.getMonth()]}`);
 
   useEffect(() => {
     setCalendarMonth(`${monthNames[currentDate.getMonth()]}`);
@@ -166,24 +164,12 @@ const MainFormSubmit = (props: { user: string }) => {
   };
 
   useEffect(() => {
-    if (formData.checkIn && formData.checkOut) {
+    if (formData.checkIn) {
       const checkInDate = new Date(formData.checkIn);
-      console.log(checkInDate.getMonth());
-      if (calendarMonth !== monthNames[checkInDate.getMonth()]) {
-
-        // const checkOutDate = new Date(formData.checkOut);
-
-        // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-        //   getNewSet(formData.checkIn, formData.checkOut);
-        // }
-        // else {
+      if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
         getNewSet(formData.checkIn, formData.checkIn);
-        // }
 
-        const dateObject = new Date(formData.checkIn);
-        const monthIndex = dateObject.getMonth();
-
-        setCalendarMonth(monthNames[monthIndex]);
+        setCurrentDate(new Date(formData.checkIn));
       }
 
 
@@ -191,23 +177,12 @@ const MainFormSubmit = (props: { user: string }) => {
   }, [formData.checkIn]);
 
   useEffect(() => {
-    if (formData.checkIn && formData.checkOut) {
+    if (formData.checkOut) {
       const checkOutDate = new Date(formData.checkOut);
-
-      if (calendarMonth !== monthNames[checkOutDate.getMonth()]) {
-        // const checkInDate = new Date(formData.checkIn);
-
-        // if (checkInDate.getMonth() === checkOutDate.getMonth()) {
-        //   getNewSet(formData.checkIn, formData.checkOut);
-        // }
-        // else {
+      if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
         getNewSet(formData.checkOut, formData.checkOut);
-        // }
 
-        const dateObject = new Date(formData.checkOut);
-        const monthIndex = dateObject.getMonth();
-
-        setCalendarMonth(monthNames[monthIndex]);
+        setCurrentDate(new Date(formData.checkOut));
       }
 
 

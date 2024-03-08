@@ -78,15 +78,30 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/components/MainFormSubmit.js
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
+var Calendar_1 = __importDefault(require("./Calendar"));
 var EditForm = function (props) {
     var navigate = (0, react_router_dom_1.useNavigate)();
     var user = props.user;
     var id = (0, react_router_dom_1.useParams)().id; // Get the ID from the route parameters
-    var _a = (0, react_1.useState)({
+    var monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    var _a = (0, react_1.useState)(function () {
+        return Array.from({ length: 42 }, function (_, index) { return ({
+            dayNumber: String(index + 1),
+            data: 'data,data,data,data,data,data,',
+            availability: true,
+        }); });
+    }), calendarData = _a[0], setCalendarData = _a[1];
+    var _b = (0, react_1.useState)({
         user: '',
         name: '',
         pax: 0,
@@ -99,8 +114,8 @@ var EditForm = function (props) {
         checkIn: '',
         checkOut: '',
         room: '',
-    }), formData = _a[0], setFormData = _a[1];
-    var _b = (0, react_1.useState)([]), selectedRooms = _b[0], setSelectedRooms = _b[1];
+    }), formData = _b[0], setFormData = _b[1];
+    var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
     (0, react_1.useEffect)(function () {
         var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
             var response, result_1, error_1;
@@ -136,6 +151,157 @@ var EditForm = function (props) {
         }); };
         fetchData();
     }, [id]);
+    var _d = (0, react_1.useState)(new Date()), currentDate = _d[0], setCurrentDate = _d[1];
+    var _e = (0, react_1.useState)(), calendarMonth = _e[0], setCalendarMonth = _e[1];
+    (0, react_1.useEffect)(function () {
+        setCalendarMonth("".concat(monthNames[currentDate.getMonth()]));
+        getNewSet(currentDate.toDateString(), currentDate.toDateString());
+        return function () {
+        };
+    }, [currentDate]);
+    var handlePrevMonth = function () {
+        var prevMonth = new Date(currentDate);
+        prevMonth.setMonth(prevMonth.getMonth() - 1);
+        setCurrentDate(prevMonth);
+    };
+    var handleNextMonth = function () {
+        var nextMonth = new Date(currentDate);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        setCurrentDate(nextMonth);
+    };
+    var checkForm = function (startDate, endDate, room) { return __awaiter(void 0, void 0, void 0, function () {
+        var link, response, errorData, errorMessage, data, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    link = "http://localhost:8000/api/main/checkEditForm?startDate=".concat(startDate, "&endDate=").concat(endDate, "&room=").concat(room, "&id=").concat(id);
+                    console.log(link);
+                    return [4 /*yield*/, fetch(link, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!!response.ok) return [3 /*break*/, 3];
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    errorData = _a.sent();
+                    errorMessage = errorData.error;
+                    throw new Error("".concat(errorMessage));
+                case 3: return [4 /*yield*/, response.json()];
+                case 4:
+                    data = _a.sent();
+                    if (data.available === 'true') {
+                        return [2 /*return*/, true];
+                    }
+                    else if (data.available === 'false') {
+                        alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
+                        return [2 /*return*/, false];
+                    }
+                    else {
+                        throw new Error("Unexpected response: ".concat(data.available));
+                    }
+                    return [3 /*break*/, 6];
+                case 5:
+                    error_2 = _a.sent();
+                    console.error('ERROR:', error_2);
+                    alert(error_2);
+                    return [2 /*return*/, false];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var getNewSet = function (startDate, endDate) { return __awaiter(void 0, void 0, void 0, function () {
+        var link, response, jsonData_1, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    link = "http://localhost:8000/api/main/getNewSetEdit?startDate=".concat(startDate, "&endDate=").concat(endDate, "&id=").concat(id);
+                    return [4 /*yield*/, fetch(link, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'include',
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: ".concat(response.status));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    jsonData_1 = _a.sent();
+                    setCalendarData(function (prevCalendarData) {
+                        var updatedData = prevCalendarData.map(function (item, index) {
+                            var dayNumber = jsonData_1.dayNumber[index] || '';
+                            var data = jsonData_1.data[index] || '';
+                            var blockData = data.split(',').map(function (item) { return item.trim(); });
+                            var isBlockDataValid = true;
+                            for (var _i = 0, selectedRooms_1 = selectedRooms; _i < selectedRooms_1.length; _i++) {
+                                var element = selectedRooms_1[_i];
+                                if (!blockData.includes(element)) {
+                                    isBlockDataValid = false;
+                                    break;
+                                }
+                            }
+                            return __assign(__assign({}, item), { dayNumber: dayNumber, data: data, availability: isBlockDataValid });
+                        });
+                        return updatedData;
+                    });
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_3 = _a.sent();
+                    console.error('Error fetching data from the API:', error_3);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    (0, react_1.useEffect)(function () {
+        if (formData.checkIn) {
+            var checkInDate = new Date(formData.checkIn);
+            if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
+                getNewSet(formData.checkIn, formData.checkIn);
+                setCurrentDate(new Date(formData.checkIn));
+            }
+        }
+    }, [formData.checkIn]);
+    (0, react_1.useEffect)(function () {
+        if (formData.checkOut) {
+            var checkOutDate = new Date(formData.checkOut);
+            if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+                getNewSet(formData.checkOut, formData.checkOut);
+                setCurrentDate(new Date(formData.checkOut));
+            }
+        }
+    }, [formData.checkOut]);
+    (0, react_1.useEffect)(function () {
+        // if (formData.checkIn && formData.checkOut) {
+        setCalendarData(function (prevCalendarData) {
+            var updatedData = prevCalendarData.map(function (item) {
+                var blockData = item.data.split(',').map(function (item) { return item.trim(); });
+                var isBlockDataValid = true;
+                for (var _i = 0, selectedRooms_2 = selectedRooms; _i < selectedRooms_2.length; _i++) {
+                    var element = selectedRooms_2[_i];
+                    if (!blockData.includes(element)) {
+                        isBlockDataValid = false;
+                        break;
+                    }
+                }
+                return __assign(__assign({}, item), { availability: isBlockDataValid });
+            });
+            return updatedData;
+        });
+        // }
+    }, [selectedRooms]);
     var handleInputChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value, type = _a.type;
         setFormData(function (prevData) {
@@ -160,17 +326,19 @@ var EditForm = function (props) {
         }
     };
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var formattedRoom, response, data, error_2;
+        var formattedRoom, response, data, error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     e.preventDefault();
                     formattedRoom = selectedRooms.join(', ');
-                    console.log(formattedRoom);
+                    formData.room = formattedRoom;
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 4, , 5]);
-                    formData.room = formattedRoom;
+                    _a.trys.push([1, 6, , 7]);
+                    return [4 /*yield*/, checkForm(formData.checkIn, formData.checkOut, formData.room)];
+                case 2:
+                    if (!_a.sent()) return [3 /*break*/, 5];
                     return [4 /*yield*/, fetch("http://localhost:8000/api/main/".concat(id), {
                             method: 'PUT', // Use PUT method for updating
                             headers: {
@@ -179,21 +347,21 @@ var EditForm = function (props) {
                             credentials: 'include',
                             body: JSON.stringify(formData),
                         })];
-                case 2:
+                case 3:
                     response = _a.sent();
                     return [4 /*yield*/, response.json()];
-                case 3:
+                case 4:
                     data = _a.sent();
-                    console.log('Response:', data);
                     if (data.message === 'Record updated successfully') {
                         navigate('/');
                     }
-                    return [3 /*break*/, 5];
-                case 4:
-                    error_2 = _a.sent();
-                    console.error('Error updating record:', error_2);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    _a.label = 5;
+                case 5: return [3 /*break*/, 7];
+                case 6:
+                    error_4 = _a.sent();
+                    console.error('Error updating record:', error_4);
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     }); };
@@ -247,6 +415,12 @@ var EditForm = function (props) {
                 "KUBO 2",
                 react_1.default.createElement("input", { className: "input", type: "checkbox", name: "e", checked: selectedRooms.includes('E'), onChange: handleCheckboxChange }),
                 "EXCLUSIVE"),
-            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Update"))));
+            react_1.default.createElement("button", { type: "submit", className: "submit-button" }, "Update")),
+        react_1.default.createElement("div", null,
+            react_1.default.createElement("button", { onClick: handlePrevMonth }, "Previous Month"),
+            react_1.default.createElement("button", { onClick: handleNextMonth }, "Next Month"),
+            react_1.default.createElement("h1", { id: 'calendarMonth' },
+                react_1.default.createElement("span", null, "".concat(monthNames[currentDate.getMonth()], " ").concat(currentDate.getFullYear())))),
+        react_1.default.createElement(Calendar_1.default, { calendarData: calendarData })));
 };
 exports.default = EditForm;

@@ -2,11 +2,31 @@
 import React, { useEffect, useState } from 'react';
 import { ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Calendar from './Calendar';
 
+interface CalendarData {
+  dayNumber: string;
+  data: string;
+  availability: boolean;
+}
 const EditForm = (props: { user: string }) => {
   const navigate = useNavigate();
   const { user } = props;
   const { id } = useParams(); // Get the ID from the route parameters
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+
+  const [calendarData, setCalendarData] = useState<CalendarData[]>(() =>
+    Array.from({ length: 42 }, (_, index) => ({
+      dayNumber: String(index + 1),
+      data: 'data,data,data,data,data,data,',
+      availability: true,
+    }))
+  );
 
   const [formData, setFormData] = useState({
     user: '',
@@ -22,7 +42,7 @@ const EditForm = (props: { user: string }) => {
     checkOut: '',
     room: '',
   });
-  
+
 
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
 
@@ -32,7 +52,7 @@ const EditForm = (props: { user: string }) => {
     videoke: boolean;
     // ... other properties
   }
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,8 +72,8 @@ const EditForm = (props: { user: string }) => {
         setFormData((prevData) => ({
           ...prevData,
           ...result,
-          videoke: Boolean (result.videoke),
-          pets: Boolean (result.pets),
+          videoke: Boolean(result.videoke),
+          pets: Boolean(result.pets),
         }));
         setSelectedRooms(result.room.split(',').map((room) => room.trim().toUpperCase()));
       } catch (error: any) {
@@ -64,6 +84,174 @@ const EditForm = (props: { user: string }) => {
     fetchData();
   }, [id]);
 
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const [calendarMonth, setCalendarMonth] = useState<string>();
+
+  useEffect(() => {
+    setCalendarMonth(`${monthNames[currentDate.getMonth()]}`);
+
+    getNewSet(currentDate.toDateString(), currentDate.toDateString());
+    return () => {
+    };
+  }, [currentDate]);
+
+  const handlePrevMonth = () => {
+    const prevMonth = new Date(currentDate);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    setCurrentDate(prevMonth);
+  };
+
+  const handleNextMonth = () => {
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    setCurrentDate(nextMonth);
+  };
+
+  const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
+    try {
+      const link = `http://localhost:8000/api/main/checkEditForm?startDate=${startDate}&endDate=${endDate}&room=${room}&id=${id}`;
+      console.log(link);
+      const response = await fetch(link, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+
+        const errorData = await response.json();
+        const errorMessage = errorData.error;
+
+        throw new Error(`${errorMessage}`);
+      }
+
+      const data = await response.json();
+
+      if (data.available === 'true') {
+        return true;
+      } else if (data.available === 'false') {
+        alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
+        return false;
+      } else {
+        throw new Error(`Unexpected response: ${data.available}`);
+      }
+
+      // return data.available === 'true';
+    } catch (error) {
+      console.error('ERROR:', error);
+      alert(error);
+      return false;
+    }
+  };
+
+  const getNewSet = async (startDate: string, endDate: string) => {
+    try {
+      const link = `http://localhost:8000/api/main/getNewSetEdit?startDate=${startDate}&endDate=${endDate}&id=${id}`;
+      const response = await fetch(link, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      interface ApiResponse {
+        dayNumber: string[];
+        data: string[];
+      }
+
+      const jsonData: ApiResponse = await response.json();
+
+      setCalendarData(prevCalendarData => {
+        const updatedData = prevCalendarData.map((item, index) => {
+          const dayNumber = jsonData.dayNumber[index] || '';
+          const data = jsonData.data[index] || '';
+
+          const blockData = data.split(',').map(item => item.trim());
+          let isBlockDataValid = true;
+
+          for (const element of selectedRooms) {
+            if (!blockData.includes(element)) {
+              isBlockDataValid = false;
+              break;
+            }
+          }
+
+          return {
+            ...item,
+            dayNumber,
+            data,
+            availability: isBlockDataValid,
+          };
+        });
+
+        return updatedData;
+      });
+
+    } catch (error) {
+      console.error('Error fetching data from the API:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.checkIn) {
+      const checkInDate = new Date(formData.checkIn);
+      if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
+        getNewSet(formData.checkIn, formData.checkIn);
+
+        setCurrentDate(new Date(formData.checkIn));
+      }
+
+
+    }
+  }, [formData.checkIn]);
+
+  useEffect(() => {
+    if (formData.checkOut) {
+      const checkOutDate = new Date(formData.checkOut);
+      if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+        getNewSet(formData.checkOut, formData.checkOut);
+
+        setCurrentDate(new Date(formData.checkOut));
+      }
+
+
+    }
+  }, [formData.checkOut]);
+
+  useEffect(() => {
+    // if (formData.checkIn && formData.checkOut) {
+    setCalendarData(prevCalendarData => {
+      const updatedData = prevCalendarData.map(item => {
+        const blockData = item.data.split(',').map(item => item.trim());
+        let isBlockDataValid = true;
+
+        for (const element of selectedRooms) {
+          if (!blockData.includes(element)) {
+            isBlockDataValid = false;
+            break;
+          }
+        }
+
+        return {
+          ...item,
+          availability: isBlockDataValid,
+        };
+      });
+      return updatedData;
+    });
+    // }
+  }, [selectedRooms]);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
 
@@ -71,6 +259,8 @@ const EditForm = (props: { user: string }) => {
       ...prevData,
       [name]: type === 'radio' ? value === 'true' : value,
     }));
+
+
   };
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -88,31 +278,31 @@ const EditForm = (props: { user: string }) => {
       });
     }
   };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     let formattedRoom = selectedRooms.join(', ');
-    console.log(formattedRoom);
+    formData.room = formattedRoom;
 
     try {
-      formData.room = formattedRoom;
+      if (await checkForm(formData.checkIn, formData.checkOut, formData.room)) {
 
-      const response = await fetch(`http://localhost:8000/api/main/${id}`, {
-        method: 'PUT', // Use PUT method for updating
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
+        const response = await fetch(`http://localhost:8000/api/main/${id}`, {
+          method: 'PUT', // Use PUT method for updating
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData),
+        });
 
-      const data = await response.json();
-      console.log('Response:', data);
+        const data = await response.json();
 
-      if (data.message === 'Record updated successfully') {
-        navigate('/');
+        if (data.message === 'Record updated successfully') {
+          navigate('/');
+        }
       }
+
     } catch (error) {
       console.error('Error updating record:', error);
     }
@@ -122,12 +312,12 @@ const EditForm = (props: { user: string }) => {
     <div>
       <h2>Edit Form</h2>
       <form onSubmit={handleSubmit} className="form">
-        
-        
 
 
 
-      <label className="label">
+
+
+        <label className="label">
           Name:
           <input className="input" type="text" name="name" value={formData.name} onChange={handleInputChange} required />
         </label>
@@ -262,6 +452,17 @@ const EditForm = (props: { user: string }) => {
           Update
         </button>
       </form>
+
+
+      <div>
+        <button onClick={handlePrevMonth}>Previous Month</button>
+        <button onClick={handleNextMonth}>Next Month</button>
+        <h1 id='calendarMonth'>
+          <span>{`${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`}</span>
+        </h1>
+      </div>
+
+      <Calendar calendarData={calendarData} />
     </div>
   );
 };
