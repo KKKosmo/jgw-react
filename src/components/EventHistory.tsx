@@ -106,7 +106,7 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
               <p><strong>Record ID:</strong> {selectedItem.record_id}</p>
               <p><strong>Event Type:</strong> {selectedItem.type}</p>
               <p><strong>User:</strong> {selectedItem.user}</p>
-              <p><strong>Summary:</strong> {selectedItem.summary}</p>
+              <p><strong>Summary:</strong> <pre>{selectedItem.summary}</pre></p>
             </>
           )}
         </Modal.Body>

@@ -157,7 +157,7 @@ var EventHistory = function () {
                 react_1.default.createElement("p", null,
                     react_1.default.createElement("strong", null, "Summary:"),
                     " ",
-                    selectedItem.summary)))),
+                    react_1.default.createElement("pre", null, selectedItem.summary))))),
             react_1.default.createElement(react_bootstrap_1.Modal.Footer, null,
                 react_1.default.createElement(react_bootstrap_1.Button, { variant: "secondary", onClick: closeModal }, "Close")))));
 };
