@@ -219,11 +219,14 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       });
 
       const data = await response.json();
-
-      // Reload data after deletion
+      console.log(data);
+      if(data.message === 'Record deleted successfully'){
+        closeModal();
+        alert("Record id: " + id + " deleted successfully.");
+      }
       fetchData();
     } catch (error) {
-      console.error('Error deleting record:', error);
+      alert('Error deleting record: ' + error);
     }
   };
 

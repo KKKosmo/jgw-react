@@ -237,12 +237,16 @@ var Home = function (_a) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     data_1 = _a.sent();
-                    // Reload data after deletion
+                    console.log(data_1);
+                    if (data_1.message === 'Record deleted successfully') {
+                        closeModal();
+                        alert("Record id: " + id + " deleted successfully.");
+                    }
                     fetchData();
                     return [3 /*break*/, 4];
                 case 3:
                     error_2 = _a.sent();
-                    console.error('Error deleting record:', error_2);
+                    alert('Error deleting record: ' + error_2);
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
