@@ -103,12 +103,12 @@ var MainFormSubmit = function (props) {
     var _b = (0, react_1.useState)({
         user: user,
         name: '',
-        pax: 0,
-        vehicle: 0,
+        pax: '',
+        vehicle: '',
         pets: null,
         videoke: null,
-        partial_payment: 0.0,
-        full_payment: 0.0,
+        partial_payment: '',
+        full_payment: '',
         paid: false,
         checkIn: '',
         checkOut: '',
@@ -138,7 +138,19 @@ var MainFormSubmit = function (props) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    if (formData.pets === null) {
+                        alert("Pets selection must not be empty");
+                        return [2 /*return*/, false];
+                    }
+                    if (formData.videoke === null) {
+                        alert("Videoke selection must not be empty");
+                        return [2 /*return*/, false];
+                    }
+                    if (!(room == '')) return [3 /*break*/, 1];
+                    alert("Room selection must not be empty");
+                    return [2 /*return*/, false];
+                case 1:
+                    _a.trys.push([1, 6, , 7]);
                     link = "http://localhost:8000/api/main/checkForm?startDate=".concat(startDate, "&endDate=").concat(endDate, "&room=").concat(room);
                     return [4 /*yield*/, fetch(link, {
                             method: 'GET',
@@ -148,16 +160,16 @@ var MainFormSubmit = function (props) {
                             },
                             credentials: 'include',
                         })];
-                case 1:
-                    response = _a.sent();
-                    if (!!response.ok) return [3 /*break*/, 3];
-                    return [4 /*yield*/, response.json()];
                 case 2:
+                    response = _a.sent();
+                    if (!!response.ok) return [3 /*break*/, 4];
+                    return [4 /*yield*/, response.json()];
+                case 3:
                     errorData = _a.sent();
                     errorMessage = errorData.error;
                     throw new Error("".concat(errorMessage));
-                case 3: return [4 /*yield*/, response.json()];
-                case 4:
+                case 4: return [4 /*yield*/, response.json()];
+                case 5:
                     data = _a.sent();
                     if (data.available === 'true') {
                         return [2 /*return*/, true];
@@ -169,13 +181,13 @@ var MainFormSubmit = function (props) {
                     else {
                         throw new Error("Unexpected response: ".concat(data.available));
                     }
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 7];
+                case 6:
                     error_1 = _a.sent();
                     console.error('ERROR:', error_1);
                     alert(error_1);
                     return [2 /*return*/, false];
-                case 6: return [2 /*return*/];
+                case 7: return [2 /*return*/];
             }
         });
     }); };

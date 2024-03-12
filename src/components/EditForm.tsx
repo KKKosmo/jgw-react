@@ -113,43 +113,61 @@ const EditForm = (props: { user: string }) => {
   };
 
   const checkForm = async (startDate: string, endDate: string, room: string): Promise<boolean> => {
-    try {
-      const link = `http://localhost:8000/api/main/checkEditForm?startDate=${startDate}&endDate=${endDate}&room=${room}&id=${id}`;
-      console.log(link);
-      const response = await fetch(link, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-
-        const errorData = await response.json();
-        const errorMessage = errorData.error;
-
-        throw new Error(`${errorMessage}`);
-      }
-
-      const data = await response.json();
-
-      if (data.available === 'true') {
-        return true;
-      } else if (data.available === 'false') {
-        alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
-        return false;
-      } else {
-        throw new Error(`Unexpected response: ${data.available}`);
-      }
-
-      // return data.available === 'true';
-    } catch (error) {
-      console.error('ERROR:', error);
-      alert(error);
-      return false;
+    if(formData.pets === null){
+      
+      alert("Pets selection must not be empty");
+      return false
     }
+    if(formData.videoke === null){
+      
+      alert("Videoke selection must not be empty");
+      return false
+    }
+    if(room == ''){
+      alert("Room selection must not be empty");
+      return false
+    }
+    else{
+      try {
+        const link = `http://localhost:8000/api/main/checkEditForm?startDate=${startDate}&endDate=${endDate}&room=${room}&id=${id}`;
+        console.log(link);
+        const response = await fetch(link, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'include',
+        });
+  
+        if (!response.ok) {
+  
+          const errorData = await response.json();
+          const errorMessage = errorData.error;
+  
+          throw new Error(`${errorMessage}`);
+        }
+  
+        const data = await response.json();
+  
+        if (data.available === 'true') {
+          return true;
+        } else if (data.available === 'false') {
+          alert("Error: Room " + formData.room + " is/are not available for " + formData.checkIn + " to " + formData.checkOut);
+          return false;
+        } else {
+          throw new Error(`Unexpected response: ${data.available}`);
+        }
+  
+        // return data.available === 'true';
+      } catch (error) {
+        console.error('ERROR:', error);
+        alert(error);
+        return false;
+      }
+    }
+
+
   };
 
   const getNewSet = async (startDate: string, endDate: string) => {
