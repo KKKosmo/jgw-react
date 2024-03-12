@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+
 
 interface EventItem {
   id: number;
@@ -20,14 +23,16 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
   const [data, setData] = useState<EventItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<EventItem | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [sortColumn, setSortColumn] = useState<string | null>('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [sortColumn, sortOrder]);
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/events', {
+      const response = await fetch(`http://localhost:8000/api/events?sort=${sortColumn}&order=${sortOrder}`, {
         headers: {
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
@@ -40,7 +45,6 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
       }
 
       const result = await response.json();
-
       setData(result.data || []);
     } catch (error: any) {
       console.error('Error fetching event data:', error.message);
@@ -56,21 +60,47 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
     setShowModal(false);
   };
 
-  const renderHeader = () => {
-    return (
-      <tr>
-        <th>Event ID</th>
-        <th>Created At</th>
-        <th>Record ID</th>
-        <th>Event Type</th>
-        <th>User</th>
-        <th>Summary</th>
-      </tr>
-    );
+  const handleSort = (column: string) => {
+    if (column !== sortColumn) {
+      setSortOrder('asc');
+    } else {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    }
+    setSortColumn(column);
   };
+  
+  const renderHeader = () => (
+    <tr>
+      <th onClick={() => handleSort('id')}>
+        Event ID {renderSortIcon('id')}
+      </th>
+      <th onClick={() => handleSort('created_at')}>
+        Created At {renderSortIcon('created_at')}
+      </th>
+      <th onClick={() => handleSort('record_id')}>
+        Record ID {renderSortIcon('record_id')}
+      </th>
+      <th onClick={() => handleSort('type')}>
+        Event Type {renderSortIcon('type')}
+      </th>
+      <th onClick={() => handleSort('user')}>
+        User {renderSortIcon('user')}
+      </th>
+      <th>Summary</th>
+    </tr>
+  );
+  
+  const renderSortIcon = (column: string) => {
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
+    } else {
+      return <FontAwesomeIcon icon={faSort} />;
+    }
+  };
+  
 
-  const renderRows = () => {
-    return data.map((item, index) => (
+  const renderRows = () =>
+    data.map((item, index) => (
       <tr
         key={item.id}
         onClick={() => handleExpand(item)}
@@ -82,11 +112,8 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
         <td>{item.type}</td>
         <td>{item.user}</td>
         <td>{item.summary && item.summary.length > 40 ? `${item.summary.substring(0, 40)}...` : item.summary}</td>
-
-
       </tr>
     ));
-  };
 
   return (
     <div>
@@ -103,12 +130,24 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
         <Modal.Body>
           {selectedItem && (
             <>
-              <p><strong>Event ID:</strong> {selectedItem.id}</p>
-              <p><strong>Created At:</strong> {selectedItem.created_at}</p>
-              <p><strong>Record ID:</strong> {selectedItem.record_id}</p>
-              <p><strong>Event Type:</strong> {selectedItem.type}</p>
-              <p><strong>User:</strong> {selectedItem.user}</p>
-              <p><strong>Summary:</strong> <pre>{selectedItem.summary}</pre></p>
+              <p>
+                <strong>Event ID:</strong> {selectedItem.id}
+              </p>
+              <p>
+                <strong>Created At:</strong> {selectedItem.created_at}
+              </p>
+              <p>
+                <strong>Record ID:</strong> {selectedItem.record_id}
+              </p>
+              <p>
+                <strong>Event Type:</strong> {selectedItem.type}
+              </p>
+              <p>
+                <strong>User:</strong> {selectedItem.user}
+              </p>
+              <p>
+                <strong>Summary:</strong> <pre>{selectedItem.summary}</pre>
+              </p>
             </>
           )}
         </Modal.Body>

@@ -61,21 +61,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var react_bootstrap_1 = require("react-bootstrap");
+var react_fontawesome_1 = require("@fortawesome/react-fontawesome");
+var free_solid_svg_icons_1 = require("@fortawesome/free-solid-svg-icons");
 var ITEMS_PER_PAGE = 10;
 var EventHistory = function () {
     var _a = (0, react_1.useState)([]), data = _a[0], setData = _a[1];
     var _b = (0, react_1.useState)(null), selectedItem = _b[0], setSelectedItem = _b[1];
     var _c = (0, react_1.useState)(false), showModal = _c[0], setShowModal = _c[1];
+    var _d = (0, react_1.useState)('id'), sortColumn = _d[0], setSortColumn = _d[1];
+    var _e = (0, react_1.useState)('desc'), sortOrder = _e[0], setSortOrder = _e[1];
     (0, react_1.useEffect)(function () {
         fetchData();
-    }, []);
+    }, [sortColumn, sortOrder]);
     var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, result, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch('http://localhost:8000/api/events', {
+                    return [4 /*yield*/, fetch("http://localhost:8000/api/events?sort=".concat(sortColumn, "&order=").concat(sortOrder), {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -107,14 +111,39 @@ var EventHistory = function () {
     var closeModal = function () {
         setShowModal(false);
     };
-    var renderHeader = function () {
-        return (react_1.default.createElement("tr", null,
-            react_1.default.createElement("th", null, "Event ID"),
-            react_1.default.createElement("th", null, "Created At"),
-            react_1.default.createElement("th", null, "Record ID"),
-            react_1.default.createElement("th", null, "Event Type"),
-            react_1.default.createElement("th", null, "User"),
-            react_1.default.createElement("th", null, "Summary")));
+    var handleSort = function (column) {
+        if (column !== sortColumn) {
+            setSortOrder('asc');
+        }
+        else {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        }
+        setSortColumn(column);
+    };
+    var renderHeader = function () { return (react_1.default.createElement("tr", null,
+        react_1.default.createElement("th", { onClick: function () { return handleSort('id'); } },
+            "Event ID ",
+            renderSortIcon('id')),
+        react_1.default.createElement("th", { onClick: function () { return handleSort('created_at'); } },
+            "Created At ",
+            renderSortIcon('created_at')),
+        react_1.default.createElement("th", { onClick: function () { return handleSort('record_id'); } },
+            "Record ID ",
+            renderSortIcon('record_id')),
+        react_1.default.createElement("th", { onClick: function () { return handleSort('type'); } },
+            "Event Type ",
+            renderSortIcon('type')),
+        react_1.default.createElement("th", { onClick: function () { return handleSort('user'); } },
+            "User ",
+            renderSortIcon('user')),
+        react_1.default.createElement("th", null, "Summary"))); };
+    var renderSortIcon = function (column) {
+        if (sortColumn === column) {
+            return sortOrder === 'asc' ? react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortUp }) : react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSortDown });
+        }
+        else {
+            return react_1.default.createElement(react_fontawesome_1.FontAwesomeIcon, { icon: free_solid_svg_icons_1.faSort });
+        }
     };
     var renderRows = function () {
         return data.map(function (item, index) { return (react_1.default.createElement("tr", { key: item.id, onClick: function () { return handleExpand(item); }, className: "table-row ".concat(index % 2 === 0 ? 'even-row' : 'odd-row') },
