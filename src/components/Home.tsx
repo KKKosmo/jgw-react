@@ -58,10 +58,14 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
   const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
+    setSelectedMonth('none');
     setStartDate(event.target.value);
   };
 
   const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
+    setSelectedMonth('none');
     setEndDate(event.target.value);
   };
 

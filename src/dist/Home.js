@@ -101,9 +101,11 @@ var Home = function (_a) {
         setRoomSelection(updatedSelection);
     };
     var handleStartDateChange = function (event) {
+        setSelectedMonth('none');
         setStartDate(event.target.value);
     };
     var handleEndDateChange = function (event) {
+        setSelectedMonth('none');
         setEndDate(event.target.value);
     };
     var handleMonthChange = function (event) {
