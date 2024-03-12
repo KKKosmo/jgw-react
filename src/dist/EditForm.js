@@ -353,6 +353,11 @@ var EditForm = function (props) {
                 case 4:
                     data = _a.sent();
                     if (data.message === 'Record updated successfully') {
+                        alert(data.message + '\n\nSummary:\n\n' + data.summary);
+                        navigate('/');
+                    }
+                    else if (data.message === 'No changes made') {
+                        alert(data.message);
                         navigate('/');
                     }
                     _a.label = 5;

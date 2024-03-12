@@ -299,6 +299,11 @@ const EditForm = (props: { user: string }) => {
         const data = await response.json();
 
         if (data.message === 'Record updated successfully') {
+          alert(data.message + '\n\nSummary:\n\n' + data.summary);
+          navigate('/');
+        }
+        else if (data.message === 'No changes made'){
+          alert(data.message);
           navigate('/');
         }
       }
