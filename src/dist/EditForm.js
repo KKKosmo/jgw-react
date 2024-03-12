@@ -116,6 +116,7 @@ var EditForm = function (props) {
         room: '',
     }), formData = _b[0], setFormData = _b[1];
     var _c = (0, react_1.useState)([]), selectedRooms = _c[0], setSelectedRooms = _c[1];
+    var _d = (0, react_1.useState)(new Date()), currentDate = _d[0], setCurrentDate = _d[1];
     (0, react_1.useEffect)(function () {
         var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
             var response, result_1, error_1;
@@ -151,7 +152,6 @@ var EditForm = function (props) {
         }); };
         fetchData();
     }, [id]);
-    var _d = (0, react_1.useState)(new Date()), currentDate = _d[0], setCurrentDate = _d[1];
     var _e = (0, react_1.useState)(), calendarMonth = _e[0], setCalendarMonth = _e[1];
     (0, react_1.useEffect)(function () {
         setCalendarMonth("".concat(monthNames[currentDate.getMonth()]));
@@ -266,23 +266,23 @@ var EditForm = function (props) {
         });
     }); };
     (0, react_1.useEffect)(function () {
-        if (formData.checkIn) {
-            var checkInDate = new Date(formData.checkIn);
-            if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
-                getNewSet(formData.checkIn, formData.checkIn);
-                setCurrentDate(new Date(formData.checkIn));
-            }
-        }
-    }, [formData.checkIn]);
-    (0, react_1.useEffect)(function () {
         if (formData.checkOut) {
             var checkOutDate = new Date(formData.checkOut);
-            if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+            if (!formData.checkIn || calendarMonth !== monthNames[checkOutDate.getMonth()]) {
                 getNewSet(formData.checkOut, formData.checkOut);
                 setCurrentDate(new Date(formData.checkOut));
             }
         }
     }, [formData.checkOut]);
+    (0, react_1.useEffect)(function () {
+        if (formData.checkIn) {
+            var checkInDate = new Date(formData.checkIn);
+            if (!formData.checkOut || calendarMonth !== monthNames[checkInDate.getMonth()]) {
+                getNewSet(formData.checkIn, formData.checkIn);
+                setCurrentDate(new Date(formData.checkIn));
+            }
+        }
+    }, [formData.checkIn]);
     (0, react_1.useEffect)(function () {
         // if (formData.checkIn && formData.checkOut) {
         setCalendarData(function (prevCalendarData) {

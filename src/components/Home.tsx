@@ -454,6 +454,14 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       </Table>
 
       <Pagination>
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        />
         {Array.from({ length: totalPages }, (_, index) => (
           <Pagination.Item
             key={index + 1}
@@ -464,15 +472,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           </Pagination.Item>
         ))}
 
-        <Pagination.Prev
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
 
-        <Pagination.Next
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        />
 
         <div className="pagination-info">
           <span>

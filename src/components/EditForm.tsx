@@ -53,6 +53,7 @@ const EditForm = (props: { user: string }) => {
     // ... other properties
   }
 
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,6 +77,10 @@ const EditForm = (props: { user: string }) => {
           pets: Boolean(result.pets),
         }));
         setSelectedRooms(result.room.split(',').map((room) => room.trim().toUpperCase()));
+
+      
+
+
       } catch (error: any) {
         console.error('Error fetching data:', error.message);
       }
@@ -84,7 +89,6 @@ const EditForm = (props: { user: string }) => {
     fetchData();
   }, [id]);
 
-  const [currentDate, setCurrentDate] = useState(new Date());
 
   const [calendarMonth, setCalendarMonth] = useState<string>();
 
@@ -203,30 +207,26 @@ const EditForm = (props: { user: string }) => {
   };
 
   useEffect(() => {
-    if (formData.checkIn) {
-      const checkInDate = new Date(formData.checkIn);
-      if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
-        getNewSet(formData.checkIn, formData.checkIn);
-
-        setCurrentDate(new Date(formData.checkIn));
-      }
-
-
-    }
-  }, [formData.checkIn]);
-
-  useEffect(() => {
-    if (formData.checkOut) {
+    if (formData.checkOut) { 
       const checkOutDate = new Date(formData.checkOut);
-      if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+      if (!formData.checkIn || calendarMonth !== monthNames[checkOutDate.getMonth()]) {
         getNewSet(formData.checkOut, formData.checkOut);
 
         setCurrentDate(new Date(formData.checkOut));
       }
-
-
     }
   }, [formData.checkOut]);
+  useEffect(() => {
+    if (formData.checkIn) {
+      const checkInDate = new Date(formData.checkIn);
+      if (!formData.checkOut || calendarMonth !== monthNames[checkInDate.getMonth()]) {
+        getNewSet(formData.checkIn, formData.checkIn);
+
+        setCurrentDate(new Date(formData.checkIn));
+      }
+    }
+  }, [formData.checkIn]);
+
 
   useEffect(() => {
     // if (formData.checkIn && formData.checkOut) {

@@ -164,30 +164,25 @@ const MainFormSubmit = (props: { user: string }) => {
   };
 
   useEffect(() => {
-    if (formData.checkIn) {
-      const checkInDate = new Date(formData.checkIn);
-      if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
-        getNewSet(formData.checkIn, formData.checkIn);
-
-        setCurrentDate(new Date(formData.checkIn));
-      }
-
-
-    }
-  }, [formData.checkIn]);
-
-  useEffect(() => {
-    if (formData.checkOut) {
+    if (formData.checkOut) { 
       const checkOutDate = new Date(formData.checkOut);
-      if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+      if (!formData.checkIn || calendarMonth !== monthNames[checkOutDate.getMonth()]) {
         getNewSet(formData.checkOut, formData.checkOut);
 
         setCurrentDate(new Date(formData.checkOut));
       }
-
-
     }
   }, [formData.checkOut]);
+  useEffect(() => {
+    if (formData.checkIn) {
+      const checkInDate = new Date(formData.checkIn);
+      if (!formData.checkOut || calendarMonth !== monthNames[checkInDate.getMonth()]) {
+        getNewSet(formData.checkIn, formData.checkIn);
+
+        setCurrentDate(new Date(formData.checkIn));
+      }
+    }
+  }, [formData.checkIn]);
 
   useEffect(() => {
     // if (formData.checkIn && formData.checkOut) {

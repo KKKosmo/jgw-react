@@ -158,18 +158,20 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Pagination.Prev>
 
-
-        {renderPageButtons()}
-
         <Pagination.Next
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           <FontAwesomeIcon icon={faChevronRight} />
         </Pagination.Next>
+
+        
+        {renderPageButtons()}
         <div className="pagination-info">
           Page {currentPage} of {totalPages} | Total of {totalItems} Records
         </div>
+
+
 
       </Pagination>
 

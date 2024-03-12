@@ -229,23 +229,23 @@ var MainFormSubmit = function (props) {
         });
     }); };
     (0, react_1.useEffect)(function () {
-        if (formData.checkIn) {
-            var checkInDate = new Date(formData.checkIn);
-            if (!formData.checkOut && calendarMonth !== monthNames[checkInDate.getMonth()]) {
-                getNewSet(formData.checkIn, formData.checkIn);
-                setCurrentDate(new Date(formData.checkIn));
-            }
-        }
-    }, [formData.checkIn]);
-    (0, react_1.useEffect)(function () {
         if (formData.checkOut) {
             var checkOutDate = new Date(formData.checkOut);
-            if (!formData.checkIn && calendarMonth !== monthNames[checkOutDate.getMonth()]) {
+            if (!formData.checkIn || calendarMonth !== monthNames[checkOutDate.getMonth()]) {
                 getNewSet(formData.checkOut, formData.checkOut);
                 setCurrentDate(new Date(formData.checkOut));
             }
         }
     }, [formData.checkOut]);
+    (0, react_1.useEffect)(function () {
+        if (formData.checkIn) {
+            var checkInDate = new Date(formData.checkIn);
+            if (!formData.checkOut || calendarMonth !== monthNames[checkInDate.getMonth()]) {
+                getNewSet(formData.checkIn, formData.checkIn);
+                setCurrentDate(new Date(formData.checkIn));
+            }
+        }
+    }, [formData.checkIn]);
     (0, react_1.useEffect)(function () {
         // if (formData.checkIn && formData.checkOut) {
         setCalendarData(function (prevCalendarData) {
