@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Modal, Button } from 'react-bootstrap';
+import { Table, Modal, Button, Pagination } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 
 interface EventItem {
@@ -25,20 +27,26 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
   const [showModal, setShowModal] = useState(false);
   const [sortColumn, setSortColumn] = useState<string | null>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     fetchData();
-  }, [sortColumn, sortOrder]);
+  }, [sortColumn, sortOrder, currentPage]);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/events?sort=${sortColumn}&order=${sortOrder}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/events?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -46,6 +54,8 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
 
       const result = await response.json();
       setData(result.data || []);
+      setTotalItems(result.total || 0);
+      setTotalPages(Math.ceil(result.total / ITEMS_PER_PAGE));
     } catch (error: any) {
       console.error('Error fetching event data:', error.message);
     }
@@ -67,8 +77,25 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     }
     setSortColumn(column);
+    setCurrentPage(1); // Reset to the first page when sorting
   };
-  
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPageButtons = () => {
+    return Array.from({ length: totalPages }, (_, index) => (
+      <Pagination.Item
+        key={index + 1}
+        active={index + 1 === currentPage}
+        onClick={() => handlePageChange(index + 1)}
+      >
+        {index + 1}
+      </Pagination.Item>
+    ));
+  };
+
   const renderHeader = () => (
     <tr>
       <th onClick={() => handleSort('id')}>
@@ -89,7 +116,7 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
       <th>Summary</th>
     </tr>
   );
-  
+
   const renderSortIcon = (column: string) => {
     if (sortColumn === column) {
       return sortOrder === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />;
@@ -97,7 +124,7 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
       return <FontAwesomeIcon icon={faSort} />;
     }
   };
-  
+
 
   const renderRows = () =>
     data.map((item, index) => (
@@ -122,6 +149,29 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
         <thead>{renderHeader()}</thead>
         <tbody>{renderRows()}</tbody>
       </Table>
+
+      <Pagination>
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </Pagination.Prev>
+
+
+        {renderPageButtons()}
+
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <FontAwesomeIcon icon={faChevronRight} />
+        </Pagination.Next>
+        <div className="pagination-info">
+          Page {currentPage} of {totalPages} | Total of {totalItems} Records
+        </div>
+
+      </Pagination>
 
       <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>

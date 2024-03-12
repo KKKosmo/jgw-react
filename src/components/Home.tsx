@@ -480,7 +480,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           </span>
           <br></br>
           <span>
-            Items {data.length} of {totalItems}
+          Total of {totalItems} Records
           </span>
         </div>
       </Pagination>
