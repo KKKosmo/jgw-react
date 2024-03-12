@@ -81,7 +81,9 @@ const EventHistory: React.FC<EventHistoryProps> = () => {
         <td>{item.record_id}</td>
         <td>{item.type}</td>
         <td>{item.user}</td>
-        <td>{item.summary}</td>
+        <td>{item.summary && item.summary.length > 40 ? `${item.summary.substring(0, 40)}...` : item.summary}</td>
+
+
       </tr>
     ));
   };

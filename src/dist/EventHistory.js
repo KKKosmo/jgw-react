@@ -123,7 +123,7 @@ var EventHistory = function () {
             react_1.default.createElement("td", null, item.record_id),
             react_1.default.createElement("td", null, item.type),
             react_1.default.createElement("td", null, item.user),
-            react_1.default.createElement("td", null, item.summary))); });
+            react_1.default.createElement("td", null, item.summary && item.summary.length > 40 ? "".concat(item.summary.substring(0, 40), "...") : item.summary))); });
     };
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("h1", null, "Event History"),
