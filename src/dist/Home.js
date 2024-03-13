@@ -458,8 +458,12 @@ var Home = function (_a) {
                     " ",
                     selectedItem.user)))),
             react_1.default.createElement(react_bootstrap_1.Modal.Footer, null,
-                react_1.default.createElement(react_bootstrap_1.Button, { variant: "primary", onClick: function () { var _a; return handleEdit((_a = selectedItem === null || selectedItem === void 0 ? void 0 : selectedItem.id) !== null && _a !== void 0 ? _a : 0); } }, "Edit"),
-                react_1.default.createElement(react_bootstrap_1.Button, { variant: "danger", onClick: function () { var _a; return handleDelete((_a = selectedItem === null || selectedItem === void 0 ? void 0 : selectedItem.id) !== null && _a !== void 0 ? _a : 0); } }, "Delete"),
+                selectedItem && (react_1.default.createElement("div", null, selectedItem.user === user ? (react_1.default.createElement(react_1.default.Fragment, null,
+                    react_1.default.createElement(react_bootstrap_1.Button, { variant: "primary", onClick: function () { return handleEdit(selectedItem.id); } }, "Edit"),
+                    react_1.default.createElement(react_bootstrap_1.Button, { variant: "danger", onClick: function () { return handleDelete(selectedItem.id); } }, "Delete"))) : (react_1.default.createElement("p", null,
+                    "Log in as ",
+                    selectedItem.user,
+                    " to make changes to this record.")))),
                 react_1.default.createElement(react_bootstrap_1.Button, { variant: "secondary", onClick: closeModal }, "Close")))));
 };
 exports.default = Home;

@@ -97,7 +97,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
 
-  
+
   useEffect(() => {
     handleFilter();
   }, [startDate, endDate, roomSelection]);
@@ -525,8 +525,25 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={() => handleEdit(selectedItem?.id ?? 0)}>Edit</Button>
-          <Button variant="danger" onClick={() => handleDelete(selectedItem?.id ?? 0)}>Delete</Button>
+
+          {selectedItem && (
+            <div>
+              {selectedItem.user === user ? (
+                <>
+                  <Button variant="primary" onClick={() => handleEdit(selectedItem.id)}>
+                    Edit
+                  </Button>
+                  <Button variant="danger" onClick={() => handleDelete(selectedItem.id)}>
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <p>Log in as {selectedItem.user} to make changes to this record.</p>
+              )}
+            </div>
+          )}
+
+
 
           <Button variant="secondary" onClick={closeModal}>
             Close

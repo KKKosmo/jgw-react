@@ -22,7 +22,7 @@ const Login = (props: { setUser: (user: string) => void }) => {
     const content = await response.json();
 
     setRedirect(true);
-    console.log(content.user);
+    console.log("Logged in as " + content.user);
     props.setUser(content.user);
   }
 

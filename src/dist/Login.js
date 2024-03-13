@@ -86,7 +86,7 @@ var Login = function (props) {
                 case 2:
                     content = _a.sent();
                     setRedirect(true);
-                    console.log(content.user);
+                    console.log("Logged in as " + content.user);
                     props.setUser(content.user);
                     return [2 /*return*/];
             }
