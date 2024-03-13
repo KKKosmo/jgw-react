@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Modal, Pagination } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { start } from 'repl';
 
 interface MainItem {
   id: number;
@@ -58,13 +59,13 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
   const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
+
     setSelectedMonth('none');
     setStartDate(event.target.value);
   };
 
   const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
+
     setSelectedMonth('none');
     setEndDate(event.target.value);
   };
@@ -74,21 +75,21 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
-    if(selectedValue == 'none'){
-      
-    setSelectedMonth(``);
-    setStartDate('');
-    setEndDate('');
+    if (selectedValue == 'none') {
+
+      setSelectedMonth(``);
+      setStartDate('');
+      setEndDate('');
     }
-    else{
+    else {
       const [numericMonth, year] = selectedValue.split(' ');
-  
+
       const selectedStartDate = new Date(`${year}-${numericMonth}-01`);
       selectedStartDate.setHours(16);
-  
+
       const lastDayOfMonth = new Date(parseInt(year, 10), parseInt(numericMonth, 10), 0);
       lastDayOfMonth.setHours(16);
-  
+
       setSelectedMonth(`${numericMonth} ${year}`);
       setStartDate(selectedStartDate.toISOString().split('T')[0]);
       setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
@@ -96,7 +97,10 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
 
-
+  
+  useEffect(() => {
+    handleFilter();
+  }, [startDate, endDate, roomSelection]);
 
 
 
@@ -193,6 +197,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
         }
       );
 
+      console.log(`http://localhost:8000/api/main?sort=${sortColumn}&order=${sortOrder}&page=${currentPage}&perPage=${ITEMS_PER_PAGE}&name=${nameFilter}&startDate=${startDate}&endDate=${endDate}&rooms=${roomFilter}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -224,7 +229,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
       const data = await response.json();
       console.log(data);
-      if(data.message === 'Record deleted successfully'){
+      if (data.message === 'Record deleted successfully') {
         closeModal();
         alert("Record id: " + id + " deleted successfully.");
       }
@@ -353,22 +358,24 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
-
-
-
-
-
-      {/* Add the filter box */}
       <div className="filter-box">
-        <h2>Filter Check-in Date</h2>
         <div className="filter-container">
+
           <label htmlFor="nameFilter">Name:</label>
           <input
             type="text"
             id="nameFilter"
             value={nameFilter}
             onChange={handleNameChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleFilter();
+              }
+            }}
           />
+          <button onClick={handleFilter}>Search</button>
+
+
 
           {/* Add the month selector dropdown */}
           <label htmlFor="monthSelector">Select Month:</label>
@@ -427,7 +434,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
 
 
-          <button onClick={handleFilter}>Apply Filters</button>
+          {/* <button onClick={handleFilter}>Apply Filters</button> */}
           <button onClick={handleResetFilters}>Reset Filters</button>
         </div>
       </div>
@@ -484,7 +491,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           </span>
           <br></br>
           <span>
-          Total of {totalItems} Records
+            Total of {totalItems} Records
           </span>
         </div>
       </Pagination>

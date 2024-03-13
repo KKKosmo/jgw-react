@@ -126,6 +126,9 @@ var Home = function (_a) {
             setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
         }
     };
+    (0, react_1.useEffect)(function () {
+        handleFilter();
+    }, [startDate, endDate, roomSelection]);
     var generateMonthOptions = function () {
         var options = [];
         var currentYear = new Date().getFullYear();
@@ -200,6 +203,7 @@ var Home = function (_a) {
                         })];
                 case 1:
                     response = _a.sent();
+                    console.log("http://localhost:8000/api/main?sort=".concat(sortColumn, "&order=").concat(sortOrder, "&page=").concat(currentPage, "&perPage=").concat(ITEMS_PER_PAGE, "&name=").concat(nameFilter, "&startDate=").concat(startDate, "&endDate=").concat(endDate, "&rooms=").concat(roomFilter));
                     if (!response.ok) {
                         throw new Error("HTTP error! Status: ".concat(response.status));
                     }
@@ -348,10 +352,14 @@ var Home = function (_a) {
         user ? 'Hi ' + user : 'You are not logged in',
         react_1.default.createElement("h1", null, "Main List"),
         react_1.default.createElement("div", { className: "filter-box" },
-            react_1.default.createElement("h2", null, "Filter Check-in Date"),
             react_1.default.createElement("div", { className: "filter-container" },
                 react_1.default.createElement("label", { htmlFor: "nameFilter" }, "Name:"),
-                react_1.default.createElement("input", { type: "text", id: "nameFilter", value: nameFilter, onChange: handleNameChange }),
+                react_1.default.createElement("input", { type: "text", id: "nameFilter", value: nameFilter, onChange: handleNameChange, onKeyDown: function (event) {
+                        if (event.key === 'Enter') {
+                            handleFilter();
+                        }
+                    } }),
+                react_1.default.createElement("button", { onClick: handleFilter }, "Search"),
                 react_1.default.createElement("label", { htmlFor: "monthSelector" }, "Select Month:"),
                 react_1.default.createElement("select", { id: "monthSelector", value: selectedMonth, onChange: handleMonthChange },
                     react_1.default.createElement("option", { value: "none" }, "none"),
@@ -366,7 +374,6 @@ var Home = function (_a) {
                 ['J', 'G', 'K1', 'K2', 'A', 'E'].map(function (room) { return (react_1.default.createElement("label", { key: room },
                     react_1.default.createElement("input", { type: "checkbox", value: room, checked: roomSelection.includes(room), onChange: function () { return handleRoomChange(room); } }),
                     room)); }),
-                react_1.default.createElement("button", { onClick: handleFilter }, "Apply Filters"),
                 react_1.default.createElement("button", { onClick: handleResetFilters }, "Reset Filters"))),
         react_1.default.createElement(react_bootstrap_1.Table, { responsive: true, bordered: true, hover: true },
             react_1.default.createElement("thead", null, renderHeader()),
